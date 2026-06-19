@@ -21,20 +21,24 @@ export default function UseCases() {
   const [active, setActive] = useState<number | null>(null);
 
   // peek follows the cursor with a soft lerp (desktop pointers only)
-  useGSAP(
-    () => {
-      if (!peekRef.current) return;
-      gsap.set(peekRef.current, { xPercent: -50, yPercent: -50 });
-      const xTo = gsap.quickTo(peekRef.current, "x", { duration: 0.5, ease: "power3" });
-      const yTo = gsap.quickTo(peekRef.current, "y", { duration: 0.5, ease: "power3" });
-      const onMove = (e: PointerEvent) => {
-        xTo(e.clientX);
-        yTo(e.clientY);
-      };
-      window.addEventListener("pointermove", onMove);
-      return () => window.removeEventListener("pointermove", onMove);
-    }
-  );
+  useGSAP(() => {
+    if (!peekRef.current) return;
+    gsap.set(peekRef.current, { xPercent: -50, yPercent: -50 });
+    const xTo = gsap.quickTo(peekRef.current, "x", {
+      duration: 0.5,
+      ease: "power3",
+    });
+    const yTo = gsap.quickTo(peekRef.current, "y", {
+      duration: 0.5,
+      ease: "power3",
+    });
+    const onMove = (e: PointerEvent) => {
+      xTo(e.clientX);
+      yTo(e.clientY);
+    };
+    window.addEventListener("pointermove", onMove);
+    return () => window.removeEventListener("pointermove", onMove);
+  });
 
   const onClose = useCallback(() => setActive(null), []);
   useEffect(() => {
@@ -67,10 +71,10 @@ export default function UseCases() {
       />
       <Reveal className="mt-5" y={16}>
         <p className="max-w-2xl text-lg text-white/60">
-          These are <b className="font-semibold text-white">example</b> third-party agents
-          and apps. A user deposits into a pool, confirms a policy that lets the app in,
-          and it transacts automatically within those bounds. Hover to see what each does
-          through the protocol.
+          These are <b className="font-semibold text-white">example</b>{" "}
+          third-party agents and apps. A user deposits into a pool, confirms a
+          policy that lets the app in, and it transacts automatically within
+          those bounds. Hover to see what each does through the protocol.
         </p>
       </Reveal>
 
@@ -80,9 +84,7 @@ export default function UseCases() {
             key={u.k}
             type="button"
             data-cursor="grow"
-            onPointerEnter={() =>
-              setPeek({ img: u.img, name: u.k })
-            }
+            onPointerEnter={() => setPeek({ img: u.img, name: u.k })}
             onPointerLeave={() => setPeek(null)}
             onClick={() => setActive(i)}
             className="group flex w-full items-center justify-between gap-6 border-b border-white/10 py-7 text-left transition-[padding] duration-300 hover:px-4 sm:py-8"
@@ -117,29 +119,7 @@ export default function UseCases() {
         ))}
       </div>
 
-      {/* cursor-following portrait peek (matches the phone screenshots) */}
-      <div
-        ref={peekRef}
-        aria-hidden
-        className={`pointer-events-none fixed left-0 top-0 z-[50] hidden h-[360px] w-[210px] overflow-hidden border border-white/15 shadow-2xl shadow-black/60 transition-opacity duration-300 sm:block ${
-          peek ? "opacity-100" : "opacity-0"
-        }`}
-      >
-        {peek && (
-          <>
-            <Image
-              src={peek.img}
-              alt=""
-              fill
-              sizes="210px"
-              className="object-cover object-top"
-            />
-            <span className="onchain absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-3 py-3 text-[12px] text-white/85">
-              {peek.name}
-            </span>
-          </>
-        )}
-      </div>
+      {/* cursor-following peek disabled — text hover is sufficient */}
 
       {/* detail modal — phone screenshot framed correctly */}
       {current && (

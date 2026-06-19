@@ -13,9 +13,12 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  --font-sans: var(--font-satoshi), ui-sans-serif, system-ui, sans-serif;
-  --font-heading: "Clash Display", var(--font-satoshi), sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --font-instrument-sans:
+    var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-instrument-serif: var(--font-instrument-serif), Georgia, serif;
 
   /* Pinace brand scale (raw, for gradients/glows) */
   --color-pinace-blue: var(--pinace-blue);
@@ -54,9 +57,6 @@
 
 :root {
   color-scheme: dark;
-
-  /* Fontshare families (loaded via <link> in layout) */
-  --font-satoshi: "Satoshi";
 
   /* raw brand — brighter, more saturated for a luminous, high-contrast feel */
   --pinace-blue: #2b8bff;
@@ -115,13 +115,7 @@
   p {
     text-wrap: pretty;
   }
-  /* hide native cursor on devices with a real pointer (custom cursor takes over) */
-  @media (hover: hover) and (pointer: fine) {
-    html.has-custom-cursor,
-    html.has-custom-cursor * {
-      cursor: none;
-    }
-  }
+  /* custom cursor managed by react-animated-cursor — no manual hide needed */
   ::selection {
     background: color-mix(in srgb, var(--pinace-blue) 40%, transparent);
     color: #fff;
@@ -169,7 +163,8 @@
 
   /* soft brand glow behind a focal element */
   .glow-blue {
-    box-shadow: 0 0 80px -10px color-mix(in srgb, var(--pinace-blue) 60%, transparent);
+    box-shadow: 0 0 80px -10px
+      color-mix(in srgb, var(--pinace-blue) 60%, transparent);
   }
   /* thin top hairline highlight for cards */
   .lift {
@@ -202,22 +197,39 @@
     align-items: center;
     justify-content: center;
     animation: logo-float 5s ease-in-out infinite;
-    filter: drop-shadow(0 0 32px color-mix(in srgb, var(--pinace-violet) 55%, transparent))
-            drop-shadow(0 0 64px color-mix(in srgb, var(--pinace-blue) 30%, transparent));
+    filter: drop-shadow(
+        0 0 32px color-mix(in srgb, var(--pinace-violet) 55%, transparent)
+      )
+      drop-shadow(
+        0 0 64px color-mix(in srgb, var(--pinace-blue) 30%, transparent)
+      );
     transition: filter 0.5s ease;
   }
 
   .pinace-logo-wrap:hover {
-    filter: drop-shadow(0 0 40px color-mix(in srgb, var(--pinace-violet) 80%, transparent))
-            drop-shadow(0 0 80px color-mix(in srgb, var(--pinace-blue) 50%, transparent))
-            drop-shadow(0 0 120px color-mix(in srgb, var(--pinace-pink) 25%, transparent));
+    filter: drop-shadow(
+        0 0 40px color-mix(in srgb, var(--pinace-violet) 80%, transparent)
+      )
+      drop-shadow(
+        0 0 80px color-mix(in srgb, var(--pinace-blue) 50%, transparent)
+      )
+      drop-shadow(
+        0 0 120px color-mix(in srgb, var(--pinace-pink) 25%, transparent)
+      );
     animation-play-state: paused;
   }
 
   @keyframes logo-float {
-    0%, 100% { transform: translateY(0px) rotate(-1deg); }
-    30%       { transform: translateY(-14px) rotate(1.5deg); }
-    60%       { transform: translateY(-7px) rotate(-0.5deg); }
+    0%,
+    100% {
+      transform: translateY(0px) rotate(-1deg);
+    }
+    30% {
+      transform: translateY(-14px) rotate(1.5deg);
+    }
+    60% {
+      transform: translateY(-7px) rotate(-0.5deg);
+    }
   }
 
   /* Spinning halo ring behind the logo */
@@ -248,7 +260,9 @@
   }
 
   @keyframes halo-spin {
-    to { transform: rotate(360deg); }
+    to {
+      transform: rotate(360deg);
+    }
   }
 
   /* Glassy frosted disc underneath the SVG */
@@ -287,10 +301,21 @@
   }
 
   @keyframes logo-shimmer {
-    0%   { background-position: -100% 0; opacity: 0; }
-    20%  { opacity: 1; }
-    60%  { background-position: 200% 0; opacity: 0; }
-    100% { background-position: 200% 0; opacity: 0; }
+    0% {
+      background-position: -100% 0;
+      opacity: 0;
+    }
+    20% {
+      opacity: 1;
+    }
+    60% {
+      background-position: 200% 0;
+      opacity: 0;
+    }
+    100% {
+      background-position: 200% 0;
+      opacity: 0;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -312,7 +337,6 @@
     }
   }
 }
-
 
 /* ── Wave UI Animations & Styling ─────────────────── */
 .wave-animation-slow {
@@ -342,4 +366,3 @@
     transform: translateX(0);
   }
 }
-

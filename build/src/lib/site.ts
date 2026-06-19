@@ -98,9 +98,18 @@ export const team = [
 ] as const;
 
 export const sdkTiers = [
-  { pkg: "@pinace/wallet-sdk", who: "End-user wallet apps (extension, mobile)" },
-  { pkg: "@pinace/agent-sdk", who: "Agent builders (LangChain, AutoGen, Eliza)" },
-  { pkg: "@pinace/mcp-server", who: "LLM tool use (Claude, GPT) — MCP compliant" },
+  {
+    pkg: "@pinace/wallet-sdk",
+    who: "End-user wallet apps (extension, mobile)",
+  },
+  {
+    pkg: "@pinace/agent-sdk",
+    who: "Agent builders (LangChain, AutoGen, Eliza)",
+  },
+  {
+    pkg: "@pinace/mcp-server",
+    who: "LLM tool use (Claude, GPT) — MCP compliant",
+  },
 ] as const;
 
 export const sdkSnippet = `const pinace = new PinaceClient({ signer: agentSigner, network: "mainnet" });
@@ -260,14 +269,46 @@ export const products = [
 
 // Ideas developers can build on the protocol.
 export const ideas = [
-  { icon: "📈", title: "DCA & TWAP bots", body: "Schedule bounded buys across DeepBook, hands-off." },
-  { icon: "⚖️", title: "Yield rebalancers", body: "Keep an LP position in range, within a budget." },
-  { icon: "🛡️", title: "Stop-loss guardian", body: "An agent that only ever exits — never adds risk." },
-  { icon: "💸", title: "Payroll & subscriptions", body: "Streaming payments capped by policy and time." },
-  { icon: "🏦", title: "Treasury management", body: "Delegate idle treasury to a scoped strategy agent." },
-  { icon: "🔁", title: "Copy-trading", body: "Mirror a strategy with your own budget ceiling." },
-  { icon: "🤖", title: "MCP tool for LLMs", body: "Give Claude or GPT a revocable on-chain wallet." },
-  { icon: "🛒", title: "Agentic checkout (AP2)", body: "Intent → cart → payment, bounded on-chain." },
+  {
+    icon: "TrendingUp",
+    title: "DCA & TWAP bots",
+    body: "Schedule bounded buys across DeepBook, hands-off.",
+  },
+  {
+    icon: "Scale",
+    title: "Yield rebalancers",
+    body: "Keep an LP position in range, within a budget.",
+  },
+  {
+    icon: "ShieldCheck",
+    title: "Stop-loss guardian",
+    body: "An agent that only ever exits — never adds risk.",
+  },
+  {
+    icon: "Banknote",
+    title: "Payroll & subscriptions",
+    body: "Streaming payments capped by policy and time.",
+  },
+  {
+    icon: "Landmark",
+    title: "Treasury management",
+    body: "Delegate idle treasury to a scoped strategy agent.",
+  },
+  {
+    icon: "RefreshCcw",
+    title: "Copy-trading",
+    body: "Mirror a strategy with your own budget ceiling.",
+  },
+  {
+    icon: "Bot",
+    title: "MCP tool for LLMs",
+    body: "Give Claude or GPT a revocable on-chain wallet.",
+  },
+  {
+    icon: "ShoppingCart",
+    title: "Agentic checkout (AP2)",
+    body: "Intent → cart → payment, bounded on-chain.",
+  },
 ] as const;
 
 export const faqs = [

@@ -1,47 +1,73 @@
 "use client";
 
 import { useState } from "react";
-import { Download } from "lucide-react";
-import { Logo } from "@/components/common/Logo";
-import { Container } from "@/components/common/Container";
-import { buttonVariants } from "@/components/ui/button";
-import { site } from "@/lib/site";
+import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+const navLinks = [
+  { label: "Products", href: "#products", hasDropdown: true },
+  { label: "How it works", href: "#how" },
+  { label: "Build", href: "#ideas" },
+  { label: "Developers", href: "#developers" },
+];
 
 export default function Nav() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-[60]">
-      <Container className="flex h-[76px] items-center gap-6">
-        <a href="#top" aria-label="Pinace home">
-          <Logo />
+    <header className="fixed inset-x-0 top-0 z-50 bg-transparent">
+      <div className="flex items-center justify-between px-6 py-4">
+        {/* Left — Sunburst icon */}
+        <a href="#top" aria-label="Home">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className="text-white"
+          >
+            <circle cx="12" cy="12" r="4" fill="currentColor" />
+            <path
+              d="M12 2v3M12 19v3M2 12h3M19 12h3M4.93 4.93l2.12 2.12M16.95 16.95l2.12 2.12M4.93 19.07l2.12-2.12M16.95 7.05l2.12-2.12"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+          </svg>
         </a>
 
-        <div className="flex flex-1 items-center justify-end gap-6 md:gap-8">
-          <nav className="hidden items-center gap-8 md:flex">
-            {site.nav.map((item) => (
-              <a
-                key={item.href}
-                href={item.href}
-                className="group relative text-sm font-medium text-white/70 transition-colors hover:text-white"
-              >
-                {item.label}
-                <span className="absolute -bottom-1 left-0 h-px w-0 bg-white transition-all duration-300 group-hover:w-full" />
-              </a>
-            ))}
-          </nav>
+        {/* Center — Navigation links (desktop) */}
+        <nav className="hidden items-center gap-8 md:flex">
+          {navLinks.map((item) => (
+            <a
+              key={item.href}
+              href={item.href}
+              className="flex items-center gap-1 font-[family-name:var(--font-instrument-sans)] text-sm font-medium text-white/80 transition-colors hover:text-white"
+            >
+              {item.label}
+              {item.hasDropdown && <ChevronDown className="size-3.5" />}
+            </a>
+          ))}
+        </nav>
 
+        {/* Right — CTA buttons */}
+        <div className="flex items-center gap-4">
           <a
-            href={site.chromeStoreUrl}
-            aria-label="Add to Chrome"
-            title="Add to Chrome"
-            className="text-white/85 transition-colors hover:text-pinace-blue-bright"
+            href="#developers"
+            className="hidden font-[family-name:var(--font-instrument-sans)] text-sm font-medium text-white/80 transition-colors hover:text-white sm:block"
           >
-            <Download className="size-5" />
+            Docs
+          </a>
+          <a
+            href="#install"
+            className="rounded-full bg-white px-5 py-2.5 font-[family-name:var(--font-instrument-sans)] text-sm font-semibold text-black transition-transform hover:scale-105"
+          >
+            Add to Chrome
           </a>
         </div>
 
+        {/* Mobile hamburger */}
         <button
           type="button"
           aria-label="Toggle menu"
@@ -56,7 +82,10 @@ export default function Nav() {
             )}
           />
           <span
-            className={cn("h-0.5 w-6 bg-white transition-opacity", open && "opacity-0")}
+            className={cn(
+              "h-0.5 w-6 bg-white transition-opacity",
+              open && "opacity-0",
+            )}
           />
           <span
             className={cn(
@@ -65,32 +94,29 @@ export default function Nav() {
             )}
           />
         </button>
-      </Container>
+      </div>
 
-      {/* mobile sheet */}
+      {/* Mobile sheet */}
       <div
         className={cn(
           "fixed inset-0 z-[-1] flex flex-col justify-center gap-2 bg-black/95 px-8 backdrop-blur-xl transition-transform duration-500 md:hidden",
           open ? "translate-y-0" : "-translate-y-full",
         )}
       >
-        {site.nav.map((item) => (
+        {navLinks.map((item) => (
           <a
             key={item.href}
             href={item.href}
             onClick={() => setOpen(false)}
-            className="font-heading border-b border-white/10 py-4 text-3xl font-semibold text-white"
+            className="border-b border-white/10 py-4 font-[family-name:var(--font-instrument-sans)] text-3xl font-semibold text-white"
           >
             {item.label}
           </a>
         ))}
         <a
-          href={site.chromeStoreUrl}
+          href="#install"
           onClick={() => setOpen(false)}
-          className={cn(
-            buttonVariants(),
-            "mt-6 h-14 rounded-full bg-primary text-base font-medium text-primary-foreground",
-          )}
+          className="mt-6 rounded-full bg-white px-5 py-3 text-center font-[family-name:var(--font-instrument-sans)] text-base font-semibold text-black"
         >
           Add to Chrome
         </a>

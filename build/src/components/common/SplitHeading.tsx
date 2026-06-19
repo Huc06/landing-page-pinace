@@ -59,10 +59,7 @@ export function SplitHeading({
       {accent ? (
         <>
           {" "}
-          <span
-            data-word
-            className="inline-block overflow-hidden align-bottom"
-          >
+          <span data-word className="inline-block overflow-hidden align-bottom">
             <span className="inline-block bg-gradient-to-r from-pinace-blue-bright to-pinace-blue bg-clip-text text-transparent">
               {accent}
             </span>

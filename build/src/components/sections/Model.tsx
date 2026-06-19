@@ -15,27 +15,29 @@ export default function Model() {
           <SplitHeading
             text="A permission you grant —"
             accent="not a key you give away."
-            className="mt-6 text-[clamp(2rem,4.6vw,3.4rem)]"
+            className="mt-5"
           />
 
           <Reveal className="mt-7 space-y-5" stagger={0.12}>
             <p className="max-w-2xl text-[1.15rem] leading-relaxed text-white/65">
-              Pinace is the autonomous agent wallet on Sui. Instead of handing an app your
-              private key, you hand it a <b className="font-semibold text-white">scoped
-              permission</b> — and the blockchain itself makes sure it can never step
-              outside.
+              Pinace is the autonomous agent wallet on Sui. Instead of handing
+              an app your private key, you hand it a{" "}
+              <b className="font-semibold text-white">scoped permission</b> —
+              and the blockchain itself makes sure it can never step outside.
             </p>
             <p className="max-w-2xl text-[1.15rem] leading-relaxed text-white/65">
-              You deposit into a pool you own and attach a policy: a budget, an allowed
-              token list, a slippage cap, an expiry. Any agent or app you choose can then
-              transact from that pool automatically — and{" "}
-              <b className="font-semibold text-white">one transaction from you confirms
-              the grant</b>.
+              You deposit into a pool you own and attach a policy: a budget, an
+              allowed token list, a slippage cap, an expiry. Any agent or app
+              you choose can then transact from that pool automatically — and{" "}
+              <b className="font-semibold text-white">
+                one transaction from you confirms the grant
+              </b>
+              .
             </p>
             <p className="max-w-2xl text-[1.15rem] leading-relaxed text-white/65">
-              Every move is checked on-chain before it settles. Revoke whenever you like;
-              their next action reverts on-chain. That&rsquo;s the whole idea —
-              automation you never have to trust.
+              Every move is checked on-chain before it settles. Revoke whenever
+              you like; their next action reverts on-chain. That&rsquo;s the
+              whole idea — automation you never have to trust.
             </p>
           </Reveal>
 
@@ -56,7 +58,10 @@ export default function Model() {
 
         {/* mascot accent — no wallet UI */}
         <Reveal className="relative hidden items-center justify-center lg:flex">
-          <div className="absolute inset-0 -z-10 opacity-60 [background:radial-gradient(55%_55%_at_50%_45%,var(--pinace-violet),transparent_70%)] [filter:blur(50px)]" aria-hidden />
+          <div
+            className="absolute inset-0 -z-10 opacity-60 [background:radial-gradient(55%_55%_at_50%_45%,var(--pinace-violet),transparent_70%)] [filter:blur(50px)]"
+            aria-hidden
+          />
           {/* Glassy halo wrapper */}
           <div className="pinace-logo-wrap relative">
             {/* spinning colour halo ring */}
