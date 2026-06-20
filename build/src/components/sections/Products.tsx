@@ -2,6 +2,8 @@ import { ArrowUpRight } from "lucide-react";
 import { Reveal } from "@/components/common/Reveal";
 import { products } from "@/lib/site";
 
+const cardLinks = ["#model", "#use-cases", "#developers"] as const;
+
 const cardStyles = [
   {
     background:
@@ -54,7 +56,7 @@ export default function Products() {
 
               {/* Bottom — pill button */}
               <a
-                href="#developers"
+                href={cardLinks[i]}
                 className="mt-auto inline-flex w-fit items-center gap-2 rounded-full bg-white/10 px-5 py-3 text-sm font-semibold uppercase tracking-wide text-white transition-all hover:bg-white/20 hover:scale-105"
               >
                 <span>learn more</span>

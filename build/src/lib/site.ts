@@ -208,6 +208,17 @@ export const capabilities = [
 // `fn` = what each does *through the Pinace protocol*, revealed on hover.
 export const useCases = [
   {
+    k: "Pinace Agent",
+    tone: "blue" as const,
+    img: "/agents/app-detail.png",
+    avatar: "/agents/deepage.svg",
+    tag: "Proof of concept · trading",
+    fn: "Conversational on-chain trading: natural-language intent → quote → policy pre-flight → atomic settlement, bounded by user-owned capabilities.",
+    meta: "PoC",
+    desc: "Conversational on-chain trading on Sui. Natural-language intent → quote → policy pre-flight → atomic settlement, all bounded by user-owned capabilities attached on chain. Part of the Pinace stack: Frontend (wallet extension) · Backend (indexer) · @pinace/core (SDK).",
+    tags: ["PoC", "DeepBook v3", "Conversational", "Bounded"],
+  },
+  {
     k: "DeepAge",
     tone: "pink" as const,
     img: "/agents/app-detail.png",

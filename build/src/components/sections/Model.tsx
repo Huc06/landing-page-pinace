@@ -1,85 +1,62 @@
 import Image from "next/image";
-import { Section } from "@/components/common/Section";
-import { SectionKicker } from "@/components/common/SectionKicker";
-import { SplitHeading } from "@/components/common/SplitHeading";
-import { CountUp } from "@/components/common/CountUp";
+import { ArrowUpRight } from "lucide-react";
 import { Reveal } from "@/components/common/Reveal";
-import { modelStats } from "@/lib/site";
 
 export default function Model() {
   return (
-    <Section id="model">
-      <div className="grid gap-12 lg:grid-cols-[1fr_0.42fr] lg:gap-16">
-        <div>
-          <SectionKicker tone="violet">What is Pinace?</SectionKicker>
-          <SplitHeading
-            text="A permission you grant —"
-            accent="not a key you give away."
-            className="mt-5"
-          />
+    <section id="model" className="relative scroll-mt-24">
+      {/* Full-width white block */}
+      <div className="w-full bg-white px-8 py-16 sm:px-14 sm:py-24 lg:px-20 lg:py-32">
+        {/* Section label */}
+        <h2 className="mx-auto max-w-6xl font-heading text-[clamp(2.4rem,5.5vw,4.5rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-black mb-12">
+          What is Pinace?
+        </h2>
 
-          <Reveal className="mt-7 space-y-5" stagger={0.12}>
-            <p className="max-w-2xl text-[1.15rem] leading-relaxed text-white/65">
-              Pinace is the autonomous agent wallet on Sui. Instead of handing
-              an app your private key, you hand it a{" "}
-              <b className="font-semibold text-white">scoped permission</b> —
-              and the blockchain itself makes sure it can never step outside.
-            </p>
-            <p className="max-w-2xl text-[1.15rem] leading-relaxed text-white/65">
-              You deposit into a pool you own and attach a policy: a budget, an
-              allowed token list, a slippage cap, an expiry. Any agent or app
-              you choose can then transact from that pool automatically — and{" "}
-              <b className="font-semibold text-white">
-                one transaction from you confirms the grant
-              </b>
-              .
-            </p>
-            <p className="max-w-2xl text-[1.15rem] leading-relaxed text-white/65">
-              Every move is checked on-chain before it settles. Revoke whenever
-              you like; their next action reverts on-chain. That&rsquo;s the
-              whole idea — automation you never have to trust.
-            </p>
-          </Reveal>
+        {/* 2-column layout */}
+        <Reveal
+          className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20"
+          y={26}
+        >
+          {/* Left — Pinace logo in dark rounded card */}
+          <div className="relative flex items-center justify-center rounded-[1.5rem] bg-gradient-to-br from-[#080c18] to-[#141a2e] p-12 sm:p-16 lg:p-20">
+            <div className="pinace-logo-wrap relative mx-auto">
+              <span className="pinace-logo-halo" aria-hidden />
+              <span className="pinace-logo-glass" aria-hidden />
+              <span className="pinace-logo-shimmer" aria-hidden />
+              <Image
+                src="/brand/logo_boat.svg"
+                alt="Pinace"
+                width={500}
+                height={550}
+                className="relative z-10 mx-auto block h-auto w-full max-w-[420px] opacity-95"
+              />
+            </div>
+          </div>
 
-          <dl className="mt-10 flex flex-wrap gap-x-14 gap-y-6">
-            {modelStats.map((s) => (
-              <div key={s.label}>
-                <dd className="font-heading bg-gradient-to-br from-pinace-blue-bright to-pinace-blue bg-clip-text text-[2.8rem] font-bold leading-none text-transparent">
-                  <CountUp to={s.to} />
-                  {s.suffix}
-                </dd>
-                <dt className="mt-2 text-sm uppercase tracking-wide text-white/45">
-                  {s.label}
-                </dt>
-              </div>
-            ))}
-          </dl>
-        </div>
+          {/* Right — content */}
+          <div>
+            <h2 className="font-heading text-[clamp(2.4rem,5vw,4.2rem)] font-bold leading-[0.95] tracking-tight text-black">
+              Delegate without
+              <br />
+              handing over keys
+            </h2>
 
-        {/* mascot accent — no wallet UI */}
-        <Reveal className="relative hidden items-center justify-center lg:flex">
-          <div
-            className="absolute inset-0 -z-10 opacity-60 [background:radial-gradient(55%_55%_at_50%_45%,var(--pinace-violet),transparent_70%)] [filter:blur(50px)]"
-            aria-hidden
-          />
-          {/* Glassy halo wrapper */}
-          <div className="pinace-logo-wrap relative">
-            {/* spinning colour halo ring */}
-            <span className="pinace-logo-halo" aria-hidden />
-            {/* frosted glass disc */}
-            <span className="pinace-logo-glass" aria-hidden />
-            {/* shimmer sweep */}
-            <span className="pinace-logo-shimmer" aria-hidden />
-            <Image
-              src="/brand/logo_boat.svg"
-              alt="Pinace"
-              width={750}
-              height={825}
-              className="relative z-10 h-auto w-full max-w-[800px] opacity-95"
-            />
+            <p className="mt-8 max-w-xl text-[1.15rem] leading-relaxed text-black/60">
+              Pinace is the autonomous agent wallet on Sui. Give an AI agent a
+              budget and a rulebook — not your private key. On-chain policy
+              enforcement, one-click revoke, all from your wallet.
+            </p>
+
+            <a
+              href="#how"
+              className="mt-10 inline-flex items-center gap-2.5 rounded-full bg-black px-7 py-4 text-[15px] font-semibold uppercase tracking-wide text-white transition-transform hover:scale-105"
+            >
+              <span>start now</span>
+              <ArrowUpRight className="size-5" />
+            </a>
           </div>
         </Reveal>
       </div>
-    </Section>
+    </section>
   );
 }

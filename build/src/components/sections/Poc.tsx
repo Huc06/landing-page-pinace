@@ -1,120 +1,62 @@
-import { Section } from "@/components/common/Section";
-import { SectionKicker } from "@/components/common/SectionKicker";
-import { SplitHeading } from "@/components/common/SplitHeading";
+import { ArrowUpRight } from "lucide-react";
 import { Reveal } from "@/components/common/Reveal";
-import { DevNote } from "@/components/common/DevNote";
-import { buttonVariants } from "@/components/ui/button";
-import { site } from "@/lib/site";
-import { cn } from "@/lib/utils";
 
-// The POC "Pinace Agent": a Next.js + AI SDK chat app. The LLM runs a tool loop —
-// quote on DeepBook v3, mirror the 4 on-chain policies, take a signed intent receipt
-// from the pool owner (AP2), then submit one atomic 6-call PTB. (see ../../../pinace-agent)
-const flow = [
-  { k: "Intent", v: "Chat an order — the AI SDK tool loop parses it" },
-  { k: "Quote", v: "DeepBook v3 devInspect prices it, read-only" },
-  { k: "Pre-flight", v: "4 policies checked off-chain, mirroring on-chain prove" },
-  { k: "Sign", v: "You sign an intent receipt in your wallet (AP2)" },
-  { k: "Execute", v: "One atomic PTB: propose → prove → authorize → take → swap → return" },
+const stackItems = [
+  { label: "Frontend", desc: "Wallet extension" },
+  { label: "Backend", desc: "Indexer" },
+  { label: "@pinace/core", desc: "SDK" },
 ];
-
-const stack = ["Next.js 16", "Vercel AI SDK 6", "OpenAI", "DeepBook v3", "@pinace/core"];
 
 export default function Poc() {
   return (
-    <Section id="poc">
-      <div className="relative overflow-hidden border border-white/12 bg-[linear-gradient(135deg,color-mix(in_srgb,var(--pinace-blue)_16%,transparent),color-mix(in_srgb,var(--pinace-violet)_10%,transparent)_55%,color-mix(in_srgb,var(--pinace-teal)_12%,transparent))] p-7 sm:p-10 lg:p-12">
-        <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr]">
-          <div>
-            <SectionKicker tone="teal">Proof of concept · Pinace Agent</SectionKicker>
-            <SplitHeading
-              text="Conversational trading on"
-              accent="DeepBook v3."
-              className="mt-6 text-[clamp(1.9rem,4.4vw,3.2rem)]"
-            />
-            <Reveal className="mt-6" y={16}>
-              <p className="max-w-xl text-lg text-white/65">
-                The Pinace Agent is a chat app where an LLM trades for you. It runs
-                autonomously with its own keypair — but every swap needs an{" "}
-                <span className="text-white">intent receipt you sign</span>, and a single
-                atomic PTB enforces all four policies on-chain. Revoke, and the next call
-                reverts with{" "}
-                <code className="onchain text-pinace-pink">E_AGENT_REVOKED</code>.
-              </p>
-            </Reveal>
+    <section id="poc" className="relative scroll-mt-24">
+      {/* Full-width white block */}
+      <div className="w-full bg-white px-8 py-16 sm:px-14 sm:py-24 lg:px-20 lg:py-32">
+        {/* Proof of concept badge */}
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="inline-block rounded-full border border-black/10 bg-[#f5f5f7] px-4 py-1.5 text-[13px] font-medium uppercase tracking-wide text-black/50">
+            Proof of concept
+          </span>
+          <h2 className="font-heading mt-6 text-[clamp(2.4rem,5.5vw,4.5rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-black">
+            <span className="block">Pinace Agent</span>
+          </h2>
+        </div>
 
-            <Reveal className="mt-5 flex flex-wrap gap-2" selector="[data-chip]" stagger={0.05} y={12}>
-              {stack.map((s) => (
-                <span
-                  key={s}
-                  data-chip
-                  className="onchain rounded-full border border-white/12 bg-white/[0.04] px-3 py-1 text-[12px] text-white/65"
-                >
-                  {s}
-                </span>
-              ))}
-            </Reveal>
+        {/* Content */}
+        <Reveal className="mx-auto mt-14 max-w-4xl" y={26}>
+          <p className="text-center text-[1.2rem] leading-relaxed text-black/60 sm:text-[1.35rem]">
+            Conversational on-chain trading on Sui. Natural-language intent →
+            quote → policy pre-flight → atomic settlement, all bounded by
+            user-owned capabilities attached on chain.
+          </p>
 
-            {/* chat intent */}
-            <Reveal className="mt-7 max-w-xl">
-              <div className="rounded-2xl border border-white/12 bg-black/40 p-5">
-                <p className="text-[15px] leading-relaxed text-white">
-                  <span className="text-white/45">&ldquo;</span>Swap 100 SUI to USDC at the
-                  best price, max{" "}
-                  <span className="text-pinace-blue-bright">12% slippage</span>, over{" "}
-                  <span className="text-pinace-blue-bright">1 day</span>.
-                  <span className="text-white/45">&rdquo;</span>
-                </p>
-              </div>
-            </Reveal>
-
-            <Reveal className="mt-6 flex flex-col gap-2.5" stagger={0.08} y={14}>
-              {flow.map((f, i) => (
-                <div key={f.k} className="flex items-center gap-3 text-[14.5px]">
-                  <span className="onchain flex h-6 w-6 flex-none items-center justify-center rounded-full bg-white/10 text-[12px] text-pinace-blue-bright">
-                    {i + 1}
-                  </span>
-                  <span className="font-medium text-white">{f.k}</span>
-                  <span className="text-white/30">—</span>
-                  <span className="text-white/60">{f.v}</span>
-                </div>
-              ))}
-            </Reveal>
-
-            {/* launch CTA — the agent will be deployed */}
-            <Reveal className="mt-8 flex flex-wrap items-center gap-4" y={14}>
-              <a
-                href={site.pocAgentUrl}
-                {...(site.pocAgentLive
-                  ? { target: "_blank", rel: "noopener noreferrer" }
-                  : {})}
-                className={cn(
-                  buttonVariants(),
-                  "h-12 rounded-full bg-white px-7 text-base font-medium text-black glow-blue hover:bg-white/90",
-                )}
+          {/* Stack items */}
+          <div className="mt-12 grid gap-4 sm:grid-cols-3">
+            {stackItems.map((item) => (
+              <div
+                key={item.label}
+                className="rounded-2xl border border-black/10 bg-[#f5f5f7] px-6 py-5 text-center transition-colors hover:bg-[#ededf0]"
               >
-                Launch the agent ↗
-              </a>
-              <span className="text-sm text-white/45">
-                {site.pocAgentLive ? "Live on mainnet" : "Deploying soon"}
-              </span>
-            </Reveal>
+                <p className="font-mono text-[15px] font-semibold text-black">
+                  {item.label}
+                </p>
+                <p className="mt-1 text-[14px] text-black/50">{item.desc}</p>
+              </div>
+            ))}
           </div>
 
-          {/* POC media — placeholder until the team drops real screenshots/recording */}
-          <Reveal className="relative mx-auto w-full max-w-[360px]">
-            <div className="glow-blue relative flex aspect-[4/5] flex-col items-center justify-center overflow-hidden border border-dashed border-white/20 bg-black/30 text-center">
-              <DevNote>POC media slot — drop screenshots / screen-recording here</DevNote>
-              <span className="text-4xl opacity-60">🪙</span>
-              <p className="onchain mt-4 px-8 text-[13px] text-white/45">
-                Dex Agent preview
-                <br />
-                <span className="text-white/30">image / video coming</span>
-              </p>
-            </div>
-          </Reveal>
-        </div>
+          {/* CTA */}
+          <div className="mt-10 flex justify-center">
+            <a
+              href="#developers"
+              className="inline-flex items-center gap-2.5 rounded-full bg-black px-7 py-4 text-[15px] font-semibold uppercase tracking-wide text-white transition-transform hover:scale-105"
+            >
+              <span>explore the stack</span>
+              <ArrowUpRight className="size-5" />
+            </a>
+          </div>
+        </Reveal>
       </div>
-    </Section>
+    </section>
   );
 }

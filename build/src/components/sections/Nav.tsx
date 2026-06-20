@@ -6,8 +6,8 @@ import { cn } from "@/lib/utils";
 
 const navLinks = [
   { label: "Products", href: "#products", hasDropdown: true },
-  { label: "How it works", href: "#how" },
-  { label: "Build", href: "#ideas" },
+  { label: "How it works", href: "#model" },
+  { label: "Build", href: "#use-cases" },
   { label: "Developers", href: "#developers" },
 ];
 
@@ -16,23 +16,22 @@ export default function Nav() {
   const [dark, setDark] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
 
-  // Detect when nav overlaps the white Products section
+  // White text only in Hero (first viewport). After scroll > 100px, always dark.
   useEffect(() => {
-    const productsEl = document.getElementById("products");
-    if (!productsEl) return;
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setDark(window.scrollY > 100);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        // When products section is at the top of viewport, switch to dark text
-        setDark(entry.isIntersecting);
-      },
-      {
-        rootMargin: "-1px 0px -95% 0px", // Only trigger when top of products hits top of viewport
-      },
-    );
-
-    observer.observe(productsEl);
-    return () => observer.disconnect();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
