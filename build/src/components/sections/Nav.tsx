@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -13,10 +13,31 @@ const navLinks = [
 
 export default function Nav() {
   const [open, setOpen] = useState(false);
+  const [dark, setDark] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
+
+  // Detect when nav overlaps the white Products section
+  useEffect(() => {
+    const productsEl = document.getElementById("products");
+    if (!productsEl) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        // When products section is at the top of viewport, switch to dark text
+        setDark(entry.isIntersecting);
+      },
+      {
+        rootMargin: "-1px 0px -95% 0px", // Only trigger when top of products hits top of viewport
+      },
+    );
+
+    observer.observe(productsEl);
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 bg-transparent">
-      <div className="flex items-center justify-between px-6 py-4">
+    <header ref={headerRef} className="fixed inset-x-0 top-0 z-50">
+      <div className="flex items-center justify-between px-6 py-4 transition-colors duration-300">
         {/* Left — Sunburst icon */}
         <a href="#top" aria-label="Home">
           <svg
@@ -25,7 +46,10 @@ export default function Nav() {
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="text-white"
+            className={cn(
+              "transition-colors duration-300",
+              dark ? "text-black" : "text-white",
+            )}
           >
             <circle cx="12" cy="12" r="4" fill="currentColor" />
             <path
@@ -43,7 +67,12 @@ export default function Nav() {
             <a
               key={item.href}
               href={item.href}
-              className="flex items-center gap-1 font-[family-name:var(--font-instrument-sans)] text-sm font-medium text-white/80 transition-colors hover:text-white"
+              className={cn(
+                "flex items-center gap-1 font-[family-name:var(--font-instrument-sans)] text-sm font-medium transition-colors duration-300",
+                dark
+                  ? "text-black/70 hover:text-black"
+                  : "text-white/80 hover:text-white",
+              )}
             >
               {item.label}
               {item.hasDropdown && <ChevronDown className="size-3.5" />}
@@ -55,13 +84,21 @@ export default function Nav() {
         <div className="flex items-center gap-4">
           <a
             href="#developers"
-            className="hidden font-[family-name:var(--font-instrument-sans)] text-sm font-medium text-white/80 transition-colors hover:text-white sm:block"
+            className={cn(
+              "hidden font-[family-name:var(--font-instrument-sans)] text-sm font-medium transition-colors duration-300 sm:block",
+              dark
+                ? "text-black/70 hover:text-black"
+                : "text-white/80 hover:text-white",
+            )}
           >
             Docs
           </a>
           <a
             href="#install"
-            className="rounded-full bg-white px-5 py-2.5 font-[family-name:var(--font-instrument-sans)] text-sm font-semibold text-black transition-transform hover:scale-105"
+            className={cn(
+              "rounded-full px-5 py-2.5 font-[family-name:var(--font-instrument-sans)] text-sm font-semibold transition-all duration-300 hover:scale-105",
+              dark ? "bg-black text-white" : "bg-white text-black",
+            )}
           >
             Add to Chrome
           </a>
@@ -77,19 +114,22 @@ export default function Nav() {
         >
           <span
             className={cn(
-              "h-0.5 w-6 bg-white transition-transform",
+              "h-0.5 w-6 transition-all duration-300",
+              dark ? "bg-black" : "bg-white",
               open && "translate-y-2 rotate-45",
             )}
           />
           <span
             className={cn(
-              "h-0.5 w-6 bg-white transition-opacity",
+              "h-0.5 w-6 transition-all duration-300",
+              dark ? "bg-black" : "bg-white",
               open && "opacity-0",
             )}
           />
           <span
             className={cn(
-              "h-0.5 w-6 bg-white transition-transform",
+              "h-0.5 w-6 transition-all duration-300",
+              dark ? "bg-black" : "bg-white",
               open && "-translate-y-2 -rotate-45",
             )}
           />

@@ -26,7 +26,7 @@ export default function Home() {
       <Nav />
       <main>
         <Hero />
-        <div className="relative z-10 bg-black">
+        <div className="relative z-10 bg-gradient-to-b from-[#05080f] via-[#0a0e1a] to-[#05080f]">
           <Products />
           <Model />
           <HowItWorks />

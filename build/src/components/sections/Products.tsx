@@ -1,83 +1,69 @@
-import { Section } from "@/components/common/Section";
-import { SectionKicker } from "@/components/common/SectionKicker";
-import { SplitHeading } from "@/components/common/SplitHeading";
+import { ArrowUpRight } from "lucide-react";
 import { Reveal } from "@/components/common/Reveal";
 import { products } from "@/lib/site";
-import { cn } from "@/lib/utils";
 
-const toneText = {
-  blue: "text-pinace-blue-bright",
-  violet: "text-pinace-violet",
-  teal: "text-pinace-teal",
-} as const;
-
-const toneGlow = {
-  blue: "group-hover:shadow-[inset_3px_0_0_var(--pinace-blue)]",
-  violet: "group-hover:shadow-[inset_3px_0_0_var(--pinace-violet)]",
-  teal: "group-hover:shadow-[inset_3px_0_0_var(--pinace-teal)]",
-} as const;
+const cardStyles = [
+  {
+    background:
+      "radial-gradient(50% 50% at 50% 50%, #591907 40.75%, #B45439 100%)",
+  },
+  {
+    background:
+      "radial-gradient(50% 50% at 50% 50%, #000000 40.75%, #7CA198 100%)",
+  },
+  {
+    background:
+      "radial-gradient(50% 50% at 50% 50%, #591B3E 0%, #902458 25%, #BB3F7D 50.48%, #D288BA 100%)",
+  },
+] as const;
 
 export default function Products() {
   return (
-    <Section id="products">
-      <SectionKicker tone="blue">Three products, one protocol</SectionKicker>
-      <SplitHeading
-        text="Wallet, Protocol,"
-        accent="SDK."
-        className="mt-6 text-[clamp(2rem,5vw,4rem)]"
-      />
-      <Reveal className="mt-5" y={16}>
-        <p className="max-w-2xl text-lg text-white/60">
-          One system, three surfaces — each removing a specific reason it used to be
-          unsafe to let software touch your money.
-        </p>
-      </Reveal>
+    <section id="products" className="relative scroll-mt-24">
+      {/* Full-width white block */}
+      <div className="w-full bg-white px-6 py-20 sm:px-12 sm:py-28 lg:px-20 lg:py-36">
+        {/* Centered heading */}
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className="font-heading text-[clamp(2.4rem,5.5vw,4.5rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-black">
+            <span className="block">Built for agents.</span>
+            <span className="block text-[#2b8bff]">Controlled by humans.</span>
+          </h2>
+        </div>
 
-      <Reveal className="mt-14 border-t border-white/10" stagger={0.1} y={26}>
-        {products.map((p, i) => (
-          <div
-            key={p.name}
-            className={cn(
-              "group grid gap-6 border-b border-white/10 py-9 transition-shadow lg:grid-cols-[0.9fr_1.05fr_1.05fr] lg:items-start lg:gap-12 lg:py-11",
-              toneGlow[p.tone],
-            )}
-          >
-            {/* index + name */}
-            <div className="flex items-baseline gap-4">
-              <span className="onchain text-sm text-white/30">0{i + 1}</span>
-              <div>
-                <h3 className="font-heading text-[2rem] font-semibold leading-none tracking-tight text-white lg:text-[2.6rem]">
-                  {p.name}
-                </h3>
-                <span className={cn("onchain mt-2 block text-[12px]", toneText[p.tone])}>
-                  {p.tag}
-                </span>
-              </div>
-            </div>
+        {/* 3 cards grid — square, bold title, pill button */}
+        <Reveal
+          className="mx-auto mt-16 grid gap-6 md:grid-cols-3"
+          stagger={0.1}
+          y={26}
+        >
+          {products.map((p, i) => (
+            <div
+              key={p.name}
+              className="group relative flex min-h-[420px] flex-col justify-between rounded-3xl p-8 transition-all duration-300 hover:scale-[1.02] sm:p-10 lg:min-h-[480px]"
+              style={cardStyles[i]}
+            >
+              {/* Title — large bold italic */}
+              <h3 className="font-heading text-[clamp(2rem,4vw,3.2rem)] font-bold italic leading-[0.95] tracking-tight text-white">
+                {p.name}
+              </h3>
 
-            {/* problem */}
-            <div>
-              <span className="text-[12px] font-semibold uppercase tracking-[0.14em] text-white/35">
-                The problem
-              </span>
-              <p className="mt-2 text-[16px] leading-relaxed text-white/55">{p.pain}</p>
-            </div>
+              {/* Description */}
+              <p className="mt-4 text-[15px] leading-relaxed text-white/60">
+                {p.give}
+              </p>
 
-            {/* what Pinace provides */}
-            <div>
-              <span
-                className={cn(
-                  "text-[12px] font-semibold uppercase tracking-[0.14em]",
-                  toneText[p.tone],
-                )}
+              {/* Bottom — pill button */}
+              <a
+                href="#developers"
+                className="mt-auto inline-flex w-fit items-center gap-2 rounded-full bg-white/10 px-5 py-3 text-sm font-semibold uppercase tracking-wide text-white transition-all hover:bg-white/20 hover:scale-105"
               >
-                What Pinace gives you
-              </span>
-              <p className="mt-2 text-[16px] leading-relaxed text-white/75">{p.give}</p>
+                <span>learn more</span>
+                <ArrowUpRight className="size-4" />
+              </a>
             </div>
-          </div>
-        ))}
-      </Reveal>
-    </Section>
+          ))}
+        </Reveal>
+      </div>
+    </section>
   );
 }
