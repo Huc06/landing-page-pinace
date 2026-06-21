@@ -36,6 +36,37 @@ an agent that swaps inside those exact bounds.
   <Card title="Integrations" href="/docs/integrations" description="Sui venues you can build agents on top of." />
 </Cards>
 
+## The killer: hot-potato settlement
+
+Pinace's superpower is the **hot-potato PTB**. Every agent action —
+swap, lend, stake, anything — runs as one atomic transaction
+shaped like:
+
+```text
+propose_action → policy.prove → take_coin → venue call → return_coin → settle
+```
+
+Each step lives in the **same PTB**. The `Request` object is a
+hot-potato (no `key`, no `drop`) — once `propose_action` mints one,
+the PTB **must** consume it via `settle` or the whole transaction
+aborts.
+
+What this guarantees:
+
+- **Atomicity** — there is no "half-done" swap on chain. Either
+  every policy passes + the venue fills + funds return to the pool,
+  or **nothing moves**.
+- **Inline enforcement** — policy `prove` runs in the same tx as
+  the venue call. The spending limit can't be checked-then-spent
+  past; the slippage cap can't be bypassed by a second tx.
+- **Composability** — N policies and 1 venue stack into one PTB.
+  Add a new venue, the same policies still gate it without changes.
+
+This is why Pinace doesn't need EVM-style allowances or trusted
+sequencers — Move enforces the bounds in the same atomic step as
+the spend. See [Hot-potato PTB](/docs/concepts/hot-potato-ptb) for
+the full pattern.
+
 ## How it fits together
 
 <Mermaid chart={`flowchart LR

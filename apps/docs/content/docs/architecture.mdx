@@ -77,6 +77,39 @@ Every numbered step is verifiable. The user's owner key was used
 **zero times** for the swap — they signed the policy attach once,
 and the agent does the rest, bounded by Move.
 
+## The hot-potato — Pinace's killer pattern
+
+Everything above hangs on one Move idiom. `propose_action` mints a
+**`Request` hot-potato** — a struct with no `key`, no `store`, no
+`drop`. Once it exists, the PTB **must** consume it via `settle`
+or the whole transaction reverts.
+
+<Mermaid chart={`flowchart LR
+  P[propose_action] -->|mint Request| R((Request))
+  R --> POL[policy.prove]
+  POL --> R
+  R --> TK[take_coin]
+  TK --> V[venue call]
+  V --> RC[return_coin]
+  RC --> R
+  R --> S[settle]
+  S -->|consume Request| OK[committed]
+  S -->|missing receipt| RV[whole tx reverts]`} />
+
+That single requirement forces every policy `prove`, every venue
+call, and the funds in/out of the pool to live in the **same**
+atomic PTB.
+
+Why this is the killer feature:
+
+- **No "half-done" state.** EVM lets `approve` and `transferFrom`
+  sit in different txs; Pinace can't — they're literally the same
+  PTB.
+- **Inline enforcement.** Spending limit + slippage cap + every
+  custom policy run in the same atomic step as the spend.
+- **Composable across venues.** A future Cetus or Scallop wrapper
+  drops into the same shape; existing policies gate it for free.
+
 ## Two guarantees this buys you
 
 - **Atomicity.** The propose → prove → settle pipeline is one PTB.
