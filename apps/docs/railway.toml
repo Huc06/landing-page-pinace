@@ -1,0 +1,10 @@
+[build]
+builder = "DOCKERFILE"
+# Dockerfile expects monorepo root as build context (we copy from
+# apps/docs/ inside the file). railway up --dir . uploads root.
+dockerfilePath = "apps/docs/Dockerfile"
+
+[deploy]
+startCommand = "pnpm exec next start -p $PORT"
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
