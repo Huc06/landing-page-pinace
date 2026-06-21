@@ -15,12 +15,12 @@ agent ops; copy + buttons swap by request type.
   participant U as User
   participant C as Sui
   A->>W: signAndExecuteAsAgent(tx)
-  W->>U: ① Review (action, signer, payload)
+  W->>U: Phase 1 - Review (action, signer, payload)
   U->>W: Sign
-  W->>W: ② Executing (progress card)
+  W->>W: Phase 2 - Executing (progress card)
   W->>C: signAndExecuteTransaction
   C-->>W: digest
-  W-->>A: { digest }
+  W-->>A: digest
   Note over W: close 600ms after terminal phase`} />
 
 ### ① Review

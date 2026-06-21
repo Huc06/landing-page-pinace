@@ -9,11 +9,12 @@ Sui Move checkpoint loop, decodes the events it cares about, and
 upserts into a Postgres schema you can query with one HTTP call.
 
 <Mermaid chart={`flowchart LR
-  C[Sui fullnode<br/>checkpoints] -->|poll by pkg id| W[Indexer worker]
+  C[Sui fullnode checkpoints] -->|poll by pkg id| W[Indexer worker]
   W -->|decode + map| DB[(Postgres)]
-  W -->|ssePublisher.publish| SUB
-  DB --> API[REST: /pools /agents /actions]
-  API --> SUB((SSE subscribers<br/>wallet · Fenik))`} />
+  DB --> API[REST endpoints]
+  W -->|publish| SSE[SSE stream]
+  API --> SUB[Wallet + Fenik subscribers]
+  SSE --> SUB`} />
 
 ## What it knows about
 
