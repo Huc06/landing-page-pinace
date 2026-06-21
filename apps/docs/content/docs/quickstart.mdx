@@ -85,22 +85,20 @@ transaction digest appear in chat. Click it to verify on
 
 ## What just happened
 
-```mermaid
-sequenceDiagram
+<Mermaid chart={`sequenceDiagram
   participant U as You (owner)
   participant W as Pinace Wallet
-  participant F as Fenik (agent app)
+  participant F as Fenik
   participant C as Sui chain
   U->>W: Deposit + attach policy
   U->>F: "Swap 0.05 WSUI → WUSDC"
-  F->>W: pinace:signAndExecuteAsAgent (built PTB)
+  F->>W: pinace:signAndExecuteAsAgent (PTB)
   W->>U: Approve popup
   U->>W: Sign
-  W->>C: PTB: propose_action → prove → swap → settle
-  C-->>W: Digest
+  W->>C: propose_action → prove → swap → settle
+  C-->>W: digest
   W-->>F: { digest }
-  F-->>U: "Swap done — view on Suiscan"
-```
+  F-->>U: "Swap done — view on Suiscan"`} />
 
 Your owner key signed exactly **two** transactions in this whole
 flow (deposit + attach policy). Every swap from here on is signed by

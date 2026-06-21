@@ -1,0 +1,101 @@
+---
+title: Architecture
+description: The 4 layers Pinace runs on, what each one owns, and how a single agent swap flows through them.
+---
+
+Pinace is small on purpose. Four layers, each owning exactly one
+job, talking over typed boundaries.
+
+<Mermaid chart={`flowchart TB
+  subgraph CLI["Client"]
+    AGENT["AI agent app<br/>(Fenik / MCP / your dApp)"]
+    WALLET["Pinace Wallet<br/>(browser extension)"]
+  end
+  subgraph LIB["SDK"]
+    CORE["@pinace/core<br/>(PTB builders + read client)"]
+    CONTRACTS["@pinace/contracts-sdk<br/>(generated Move bindings)"]
+    CORE --> CONTRACTS
+  end
+  subgraph SRV["Services"]
+    INDEXER["Indexer<br/>(Fastify + Postgres + SSE)"]
+  end
+  subgraph CHAIN["Sui chain"]
+    POOL["BalancePool"]
+    POLICIES["Policy objects"]
+    DEX["DeepBook / Cetus / ..."]
+  end
+  AGENT -- "Wallet Standard" --> WALLET
+  AGENT --> CORE
+  WALLET --> CORE
+  CORE -- "Move call" --> POOL
+  CORE -- "Move call" --> POLICIES
+  POOL -- "events" --> INDEXER
+  POLICIES -- "events" --> INDEXER
+  INDEXER -- "REST + SSE" --> AGENT
+  INDEXER -- "REST + SSE" --> WALLET
+  POOL <--> DEX`} />
+
+## What each layer owns
+
+| Layer | Owns | Doesn't own |
+| --- | --- | --- |
+| **Wallet** | Owner key (encrypted local), pool ownership UI, policy management, agent sign approvals. | Trading logic, indexer state. |
+| **Agent app** | Intent → PTB conversion (chat, MCP, bot). Holds the agent keypair (or asks the wallet to). | Owner key. Funds. |
+| **SDK** | PTB builders (`@pinace/core`), low-level Move bindings (`@pinace/contracts-sdk`), read client. Pure functions, no I/O of its own. | Storage, signing. |
+| **Indexer** | Denormalised read API + SSE stream over chain events. | Settlement authority — chain is. |
+| **Sui chain** | Source of truth. `BalancePool` + `Policy<W,C>` objects + their `propose_action → settle` PTB pipeline. | Everything else. |
+
+## End-to-end swap flow
+
+When a user types *"Swap 0.05 WSUI to WUSDC"* in Fenik:
+
+<Mermaid chart={`sequenceDiagram
+  participant U as User
+  participant F as Fenik (agent app)
+  participant W as Pinace Wallet
+  participant C as Sui chain
+  participant I as Indexer
+  U->>F: "Swap 0.05 WSUI → WUSDC"
+  F->>I: GET /agents/:id (read policy state)
+  I-->>F: spending_limit { spent_in_window: 0.6 / 2 }
+  F->>F: pre-flight checkSwapAllowed (off-chain mirror)
+  F->>C: getQuote (DeepBook RPC)
+  F->>F: build PTB (propose → prove → take → swap → return → settle)
+  F->>W: pinace:signAndExecuteAsAgent(tx)
+  W->>U: ① Sign approval popup
+  U->>W: Sign
+  W->>W: ② Executing progress (Sign → Broadcast → Finalise)
+  W->>C: signAndExecuteTransaction(agent key)
+  C-->>W: digest
+  W-->>F: { digest }
+  C-->>I: events (ActionProposed, FlowAuthorized, FlowCompleted, ActionSettled)
+  I-->>W: SSE pool_deposit / pool_withdraw
+  I-->>F: SSE action_settled
+  F-->>U: "Done — view on Suiscan"`} />
+
+Every numbered step is verifiable. The user's owner key was used
+**zero times** for the swap — they signed the policy attach once,
+and the agent does the rest, bounded by Move.
+
+## Two guarantees this buys you
+
+- **Atomicity.** The propose → prove → settle pipeline is one PTB.
+  If the spending-limit assert fails, the DeepBook swap doesn't
+  happen. If DeepBook returns less than `min_amount_out`, nothing
+  moves. There is no "half-done" state to recover from.
+
+- **Revocability without a sweep.** The owner can burn the agent's
+  authority with one signed `revoke_agent` call. The next
+  `propose_action` from that address aborts with `E_REVOKED`. No
+  per-token approval to clean up — see
+  [Revocation](/docs/concepts/revocation).
+
+## Where each piece lives
+
+| Component | Repo | Hosted at |
+| --- | --- | --- |
+| Wallet extension | [`pinace-wallet/frontend`](https://github.com/pinace-wallet/frontend) | Chrome Web Store listing in review; load unpacked for now. |
+| Indexer + API | [`pinace-wallet/backend`](https://github.com/pinace-wallet/backend) | `https://fenik.one` (REST + SSE). |
+| Fenik (reference agent) | [`pinace-wallet/pinace-agent`](https://github.com/pinace-wallet/pinace-agent) | [`https://fenik.one`](https://fenik.one) (the chat). |
+| `@pinace/core` SDK | [`pinace-wallet/contracts-sdk`](https://github.com/pinace-wallet/contracts-sdk) | [npm](https://www.npmjs.com/package/@pinace/core). |
+| Move contracts | (private during testnet) | Sui testnet — see [PACKAGE_IDS](/docs/sdk/package-ids). |

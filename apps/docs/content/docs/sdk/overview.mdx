@@ -19,6 +19,21 @@ Three things you'll touch:
 | `policies/*` | Helpers to compose policy configs (spending limit, slippage, etc.) and bind them to `attach_policy<W, C>`. |
 | `read/*` | A small read client (over `@mysten/sui/grpc`) for the data the indexer doesn't yet host — mostly object state. |
 
+## Two packages, one surface
+
+`@pinace/core` is the **friendly** surface. Under the hood it
+re-exports the lower-level **`@pinace/contracts-sdk`** — Sui Move
+bindings generated directly from the contract source (`codegen`).
+
+| Package | Use when |
+| --- | --- |
+| `@pinace/core` | Almost always. Composed builders, named arguments, sensible defaults. |
+| `@pinace/contracts-sdk` | You need raw access to a Move function `@pinace/core` doesn't wrap yet, or you're shipping your own policy contract and want the generated `Witness` / `Config` types. |
+
+Pinace bumps `contracts-sdk` whenever the Move package changes, then
+re-publishes `@pinace/core` on top. **Always pin both via npm** —
+they ship lock-step.
+
 ## What's NOT in the SDK
 
 - **No signer.** You bring your own `Ed25519Keypair` (or the agent's

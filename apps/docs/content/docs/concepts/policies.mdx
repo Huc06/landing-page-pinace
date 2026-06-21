@@ -62,20 +62,18 @@ Active-from / active-until timestamps. Used for one-shot delegations.
 
 ## Lifecycle
 
-```mermaid
-sequenceDiagram
+<Mermaid chart={`sequenceDiagram
   participant U as Owner
   participant W as Pinace Wallet
   participant P as Pool (chain)
   participant A as Agent
-  U->>W: Attach spending_limit { 0.1 SUI / tx, 1 SUI / 1h }
-  W->>P: PTB: balance_pool::attach_policy<Witness, Config>
+  U->>W: Attach spending_limit { 0.1 SUI/tx, 1 SUI/1h }
+  W->>P: balance_pool::attach_policy
   P-->>U: Policy live, scoped to (agent, witness)
   A->>P: propose_action (request)
-  A->>P: spending_limit_policy::prove(pool, request, clock)
-  P-->>A: receipt added to request
-  A->>P: ... take_coin → settle
-```
+  A->>P: spending_limit_policy::prove
+  P-->>A: receipt added
+  A->>P: take_coin → settle`} />
 
 The owner can attach, **update** (recompose config), or **detach**
 policies at any time. Every change is a signed owner tx.

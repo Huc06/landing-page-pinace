@@ -31,22 +31,19 @@ an agent that swaps inside those exact bounds.
 
 ## How it fits together
 
-```mermaid
-flowchart LR
+<Mermaid chart={`flowchart LR
   USER["Owner (Pinace Wallet)"]
-  POOL["BalancePool<br/>(on-chain escrow)"]
-  POLICY["Policy objects<br/>(spending_limit, slippage, ...)"]
-  AGENT["AI agent<br/>(your dApp)"]
+  POOL["BalancePool"]
+  POLICY["Policy objects"]
+  AGENT["AI agent"]
   DEX["DeepBook v3 / Cetus / ..."]
-
   USER -- "1. deposit" --> POOL
-  USER -- "2. attach + sign" --> POLICY
-  USER -- "3. connectAgent" --> AGENT
-  AGENT -- "4. propose_action<br/>(hot-potato PTB)" --> POOL
-  POLICY -- "5. assert" --> POOL
+  USER -- "2. attach policy" --> POLICY
+  USER -- "3. connect" --> AGENT
+  AGENT -- "4. propose_action" --> POOL
+  POLICY -- "5. prove" --> POOL
   POOL -- "6. swap" --> DEX
-  DEX -- "7. return_coin" --> POOL
-```
+  DEX -- "7. return_coin" --> POOL`} />
 
 Every step is a verifiable on-chain transaction. The agent never holds
 the owner's key. Policies are checked inside the **same** PTB as the
