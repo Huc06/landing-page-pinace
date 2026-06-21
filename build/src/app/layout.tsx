@@ -63,15 +63,11 @@ export const metadata: Metadata = {
     description:
       "Give an AI agent a budget and a rulebook, not your private key. On-chain limits, one-click revoke.",
   },
-  // Browser tab + bookmark icon. SVG covers modern browsers; falls
-  // back to /favicon.ico for legacy.
-  icons: {
-    icon: [
-      { url: "/brand/pinace-logo.svg", type: "image/svg+xml" },
-      { url: "/favicon.ico", sizes: "any" },
-    ],
-    apple: "/brand/pinace-logo.svg",
-  },
+  // Browser tab icon is picked up from src/app/icon.svg via the
+  // App Router file-convention. No manual `icons` config needed —
+  // Next.js injects the right <link rel="icon"> tags. We dropped
+  // the old src/app/favicon.ico (Next.js template default) so the
+  // SVG isn't overridden.
 };
 
 export default function RootLayout({
