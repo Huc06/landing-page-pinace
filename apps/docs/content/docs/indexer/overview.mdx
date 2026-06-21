@@ -8,19 +8,12 @@ page load is slow and complicated. The Pinace Indexer follows a
 Sui Move checkpoint loop, decodes the events it cares about, and
 upserts into a Postgres schema you can query with one HTTP call.
 
-```text
-Sui fullnode (events)
-        │
-        ▼  poll checkpoints by package id
-┌─────────────────┐
-│ Indexer worker  │ ── parse + map ──▶  Postgres
-└─────────────────┘                       │
-        │                                 │
-        └─ ssePublisher.publish() ────────┘
-                       │
-                       ▼
-              SSE subscribers (wallet, Fenik)
-```
+<Mermaid chart={`flowchart LR
+  C[Sui fullnode<br/>checkpoints] -->|poll by pkg id| W[Indexer worker]
+  W -->|decode + map| DB[(Postgres)]
+  W -->|ssePublisher.publish| SUB
+  DB --> API[REST: /pools /agents /actions]
+  API --> SUB((SSE subscribers<br/>wallet · Fenik))`} />
 
 ## What it knows about
 

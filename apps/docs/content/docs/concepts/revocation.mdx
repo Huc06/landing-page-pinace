@@ -8,6 +8,21 @@ EVM `approve` pattern. There's no per-token sweep, no "spend it
 before they revoke" race — one tx ends the agent's authority for
 all coins, forever.
 
+<Mermaid chart={`sequenceDiagram
+  participant U as Owner
+  participant W as Pinace Wallet
+  participant C as Sui chain
+  participant A as Agent
+  U->>W: toggle "Agent enabled" off
+  W->>U: confirm dialog (type short addr)
+  U->>W: Sign & revoke
+  W->>C: balance_pool::revoke_agent(pool, agent)
+  C-->>C: delegation::burn + drop policy configs
+  C-->>W: AgentRevokedEvent
+  Note over A: holds the keypair...
+  A->>C: propose_action (next attempt)
+  C-->>A: abort E_REVOKED — whole tx reverts`} />
+
 ## What happens on chain
 
 ```move

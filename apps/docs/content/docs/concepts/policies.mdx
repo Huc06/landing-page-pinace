@@ -3,6 +3,28 @@ title: Policies
 description: On-chain rules that constrain what an agent can do. Move enforces them inside the same PTB as the swap — break a rule and the whole tx reverts.
 ---
 
+## Where guards sit in the pipeline
+
+<Mermaid chart={`flowchart LR
+  AGT["Agent app<br/>builds PTB"] --> PR[propose_action]
+  PR --> POL{Policies}
+  POL --> P1[spending_limit<br/>amount caps]
+  POL --> P2[slippage_guard<br/>price-band]
+  POL --> P3[token_whitelist<br/>allowed coins]
+  POL --> P4[time_window<br/>active from / to]
+  P1 --> ALL{all pass?}
+  P2 --> ALL
+  P3 --> ALL
+  P4 --> ALL
+  ALL -->|yes| GO[take_coin → venue → return → settle]
+  ALL -->|no| RV[abort → whole tx reverts]`} />
+
+Each guard runs independently inside the same PTB. Pinace ships
+the four boxed types; you can add your own (see "Writing your own
+policy" below) and they slot in the same way.
+
+## What a policy is
+
 A **policy** is a Move object the owner attaches to a pool. It
 exposes one `prove(...)` entry that the agent must call inside its
 action PTB; if `prove` aborts, the whole transaction reverts and

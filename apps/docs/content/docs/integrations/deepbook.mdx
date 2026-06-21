@@ -9,6 +9,24 @@ reference for how a venue plugs in. Fenik (the chat agent demo) and
 the wallet's own quote UI both call DeepBook through the same SDK
 builder.
 
+## Swap flow
+
+<Mermaid chart={`sequenceDiagram
+  participant AGT as Agent
+  participant POOL as BalancePool
+  participant SL as spending_limit
+  participant DB as DeepBook v3
+  AGT->>POOL: propose_action (Swap, amountIn, minOut)
+  AGT->>SL: prove (spent + amountIn <= cap)
+  SL-->>POOL: receipt
+  AGT->>POOL: take_coin<WSUI>
+  POOL-->>AGT: Coin<WSUI>
+  AGT->>DB: pool::swap_exact_base
+  DB-->>AGT: Coin<WUSDC> + remainder
+  AGT->>POOL: return_coin<WUSDC>
+  AGT->>POOL: settle
+  POOL-->>AGT: FlowCompletedEvent`} />
+
 ## What an agent does on DeepBook
 
 ```ts

@@ -9,21 +9,19 @@ agent ops; copy + buttons swap by request type.
 
 ## Two phases
 
-```mermaid
-sequenceDiagram
+<Mermaid chart={`sequenceDiagram
   participant A as Agent app
-  participant W as Pinace Wallet (popup)
+  participant W as Pinace Wallet
   participant U as User
   participant C as Sui
   A->>W: signAndExecuteAsAgent(tx)
-  W->>U: ① REVIEW (action, signer, payload accordion)
+  W->>U: ① Review (action, signer, payload)
   U->>W: Sign
-  W->>W: ② EXECUTING (progress card)
+  W->>W: ② Executing (progress card)
   W->>C: signAndExecuteTransaction
   C-->>W: digest
   W-->>A: { digest }
-  W-->>W: close popup (600ms after terminal phase)
-```
+  Note over W: close 600ms after terminal phase`} />
 
 ### ① Review
 

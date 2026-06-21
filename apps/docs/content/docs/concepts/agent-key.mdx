@@ -3,6 +3,27 @@ title: Agent key
 description: Each agent app gets its own Ed25519 keypair derived from the owner + origin + platform. Deterministic, scoped, revocable.
 ---
 
+## Connect flow
+
+<Mermaid chart={`sequenceDiagram
+  participant S as Site (agent app)
+  participant W as Pinace Wallet
+  participant U as Owner
+  participant C as Sui chain
+  S->>W: pinace:connectAgent { platform, origin }
+  alt binding already exists
+    W-->>S: { agentAddress, poolId, reused: true }
+  else first time this origin
+    W->>U: Approval popup "Allow this site to act as an agent?"
+    U->>W: Allow
+    W->>W: derive Ed25519 from sha256(owner || origin || platform)
+    W->>C: balance_pool::create_pool (if no owner pool yet)
+    W->>C: delegation::connect_agent(pool, agentAddress)
+    W->>C: small SUI top-up to agent (gas)
+    C-->>W: success
+    W-->>S: { agentAddress, poolId, reused: false }
+  end`} />
+
 When the owner taps **Allow & connect** in the wallet's approval
 popup, Pinace **derives** an Ed25519 keypair for that agent:
 

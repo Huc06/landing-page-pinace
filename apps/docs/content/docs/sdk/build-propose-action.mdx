@@ -8,6 +8,18 @@ travel through every policy `prove` call, the venue call, and
 finally `settle` — all in one PTB. `@pinace/core` ships builders for
 each step so you don't have to write Move call signatures by hand.
 
+<Mermaid chart={`flowchart LR
+  B1[buildProposeAction] --> R((Request))
+  R --> B2[buildPolicyProves]
+  B2 --> R
+  R --> B3[take_coin]
+  B3 --> VENUE[venue call<br/>DeepBook / Cetus / ...]
+  VENUE --> B4[return_coin]
+  B4 --> R
+  R --> B5[buildSettleAction]
+  B5 --> SIGN[sign with agent key]
+  SIGN --> SUBMIT[submit to Sui]`} />
+
 ```ts
 import { Transaction } from '@mysten/sui/transactions';
 import {

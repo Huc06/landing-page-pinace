@@ -3,6 +3,33 @@ title: Hot-potato PTB
 description: Why every Pinace action is one atomic transaction — and what happens when something inside it goes wrong.
 ---
 
+## Generic action lifecycle
+
+An **action** is any unit of work the agent proposes (swap, lend,
+stake, transfer, ...). Today Pinace ships `ActionKind.Swap`; future
+kinds plug into the same pipeline.
+
+<Mermaid chart={`flowchart LR
+  P[propose_action] --> V{policies}
+  V --> P1[spending_limit.prove]
+  V --> P2[slippage_guard.prove]
+  V --> P3[your custom policy.prove]
+  P1 --> T[take_coin]
+  P2 --> T
+  P3 --> T
+  T --> X[venue call<br/>swap / lend / stake / ...]
+  X --> R[return_coin]
+  R --> S[settle]
+  S -->|all proofs OK| OK[on-chain success]
+  S -->|missing proof| FAIL[whole tx reverts]`} />
+
+Each step is one move call inside one PTB. The dotted box (venue
+call) is the only thing that changes between action kinds — every
+swap, lend, or stake walks the same propose → prove → take → venue
+→ return → settle chain.
+
+## The hot potato
+
 Sui Move has a "hot-potato" pattern: a struct with no `key`, no
 `store`, no `drop` — once it exists, it **must** be consumed in the
 same transaction or the PTB fails. Pinace uses this for `Request`.
