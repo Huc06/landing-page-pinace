@@ -1,26 +1,20 @@
-# Build context = repo root.
-# Railway runs this with RAILWAY_DOCKERFILE_PATH=apps/docs/Dockerfile.
-FROM node:22-alpine AS build
-WORKDIR /app
+# Railway build context = repo root (RAILWAY_DOCKERFILE_PATH=apps/docs/Dockerfile).
+# Single-stage build keeps it small and predictable. fumadocs-mdx's
+# postinstall script reads source.config.ts + content/docs/**, so we
+# copy the whole apps/docs/ tree BEFORE pnpm install — otherwise the
+# postinstall tries to codegen from a missing config and dies.
+FROM node:22-alpine
+WORKDIR /app/apps/docs
 RUN corepack enable && corepack prepare pnpm@10.33.0 --activate
 
-# Install deps (postinstall runs fumadocs-mdx codegen).
-COPY apps/docs/package.json apps/docs/
-WORKDIR /app/apps/docs
+# .npmrc next to package.json enables shamefully-hoist so fumadocs-mdx
+# can resolve its vite / rolldown peers at the package root.
+COPY apps/docs/ ./
+
+ENV NEXT_TELEMETRY_DISABLED=1
 RUN pnpm install --no-frozen-lockfile
 
-# Now bring in the docs source + build Next.
-WORKDIR /app
-COPY apps/docs/ apps/docs/
-WORKDIR /app/apps/docs
-ENV NEXT_TELEMETRY_DISABLED=1
 RUN pnpm build
 
-# ----------------------------------------------------------------
-FROM node:22-alpine AS runtime
-WORKDIR /app/apps/docs
 ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
-RUN corepack enable && corepack prepare pnpm@10.33.0 --activate
-COPY --from=build /app/apps/docs ./
 CMD ["sh", "-c", "pnpm exec next start -p ${PORT:-3000}"]
