@@ -22,11 +22,11 @@ const cardStyles = [
 export default function Products() {
   return (
     <section id="products" className="relative scroll-mt-24">
-      {/* Full-width white block */}
-      <div className="w-full bg-white px-6 py-20 sm:px-12 sm:py-28 lg:px-20 lg:py-36">
+      {/* Full-width section block */}
+      <div className="w-full bg-panel px-6 py-20 sm:px-12 sm:py-28 lg:px-20 lg:py-36">
         {/* Centered heading */}
         <div className="mx-auto max-w-3xl text-center">
-          <h2 className="font-heading text-[clamp(2.4rem,5.5vw,4.5rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-black">
+          <h2 className="font-heading text-[clamp(2.4rem,5.5vw,4.5rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-foreground">
             <span className="block">Built for agents.</span>
             <span className="block text-[#2b8bff]">Controlled by humans.</span>
           </h2>

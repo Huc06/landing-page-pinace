@@ -7,6 +7,7 @@ import {
 } from "next/font/google";
 import "./globals.css";
 import { Atmosphere } from "@/components/common/Atmosphere";
+import { ThemeProvider } from "@/components/common/ThemeProvider";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -70,12 +71,15 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`dark ${inter.variable} ${jetbrainsMono.variable} ${instrumentSans.variable} ${instrumentSerif.variable}`}
+      suppressHydrationWarning
+      className={`${inter.variable} ${jetbrainsMono.variable} ${instrumentSans.variable} ${instrumentSerif.variable}`}
     >
       <head />
       <body className="relative min-h-dvh antialiased">
-        <Atmosphere />
-        <div className="relative z-10">{children}</div>
+        <ThemeProvider>
+          <Atmosphere />
+          <div className="relative z-10">{children}</div>
+        </ThemeProvider>
       </body>
     </html>
   );

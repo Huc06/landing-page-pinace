@@ -81,20 +81,20 @@ export default function UseCases() {
   return (
     <section id="use-cases" className="relative scroll-mt-24">
       {/* Full-width white block */}
-      <div className="w-full bg-white px-8 py-16 sm:px-14 sm:py-24 lg:px-20 lg:py-32">
+      <div className="w-full bg-panel px-8 py-16 sm:px-14 sm:py-24 lg:px-20 lg:py-32">
         {/* Left-aligned heading */}
         <div className="mx-auto max-w-5xl">
-          <h2 className="font-heading text-[clamp(2.4rem,5.5vw,4.5rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-black">
+          <h2 className="font-heading text-[clamp(2.4rem,5.5vw,4.5rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-foreground">
             For example.
           </h2>
-          <p className="mt-4 max-w-2xl text-[1.1rem] leading-relaxed text-black/60">
+          <p className="mt-4 max-w-2xl text-[1.1rem] leading-relaxed text-foreground/60">
             Apps and agents that use the Pinace protocol. A user deposits into a
             pool, confirms a policy, and automation runs within those bounds.
           </p>
         </div>
 
         {/* Agent rows */}
-        <div className="mx-auto mt-14 max-w-5xl border-t border-black/10">
+        <div className="mx-auto mt-14 max-w-5xl border-t border-border">
           {useCases.map((u, i) => (
             <button
               key={u.k}
@@ -105,7 +105,7 @@ export default function UseCases() {
                 setHoverIdx(i);
               }}
               onMouseLeave={() => setHoverIdx(null)}
-              className="group flex w-full items-center justify-between gap-6 border-b border-black/10 py-7 text-left transition-[padding] duration-300 hover:px-4 sm:py-8"
+              className="group flex w-full items-center justify-between gap-6 border-b border-border py-7 text-left transition-[padding] duration-300 hover:px-4 sm:py-8"
             >
               <span className="flex min-w-0 items-center gap-5">
                 <Image
@@ -116,15 +116,15 @@ export default function UseCases() {
                   className="hidden h-12 w-12 flex-none rounded-full sm:block"
                 />
                 <span className="min-w-0">
-                  <span className="font-heading block truncate text-[clamp(1.5rem,4vw,2.6rem)] font-semibold tracking-tight text-black transition-colors group-hover:text-[#2b8bff]">
+                  <span className="font-heading block truncate text-[clamp(1.5rem,4vw,2.6rem)] font-semibold tracking-tight text-foreground transition-colors group-hover:text-[#2b8bff]">
                     {u.k}
                   </span>
-                  <span className="mt-1 block text-sm text-black/40">
+                  <span className="mt-1 block text-sm text-foreground/40">
                     {u.tag}
                   </span>
                 </span>
               </span>
-              <span className="hidden flex-none text-right font-mono text-[13px] text-black/30 md:block">
+              <span className="hidden flex-none text-right font-mono text-[13px] text-foreground/30 md:block">
                 {u.meta}
               </span>
             </button>
@@ -137,11 +137,11 @@ export default function UseCases() {
         <div
           ref={peekRef}
           aria-hidden
-          className={`pointer-events-none fixed left-0 top-0 z-[60] w-[320px] -translate-x-1/2 -translate-y-1/2 rotate-[-6deg] overflow-hidden rounded-2xl border border-black/10 bg-white shadow-[0_30px_80px_rgba(0,0,0,0.35)] transition-[opacity,transform] duration-300 ease-out ${
+          className={`pointer-events-none fixed left-0 top-0 z-[60] w-[320px] -translate-x-1/2 -translate-y-1/2 rotate-[-6deg] overflow-hidden rounded-2xl border border-border bg-panel shadow-[0_30px_80px_rgba(0,0,0,0.35)] transition-[opacity,transform] duration-300 ease-out ${
             peekOn ? "scale-100 opacity-100" : "scale-90 opacity-0"
           }`}
         >
-          <div className="relative h-[200px] w-full bg-[#f5f5f7]">
+          <div className="relative h-[200px] w-full bg-muted">
             <Image
               src={peekItem.img}
               alt=""
@@ -151,10 +151,10 @@ export default function UseCases() {
             />
           </div>
           <div className="p-4">
-            <p className="font-heading text-base font-semibold tracking-tight text-black">
+            <p className="font-heading text-base font-semibold tracking-tight text-foreground">
               {peekItem.k}
             </p>
-            <p className="mt-1 line-clamp-2 text-[13px] leading-snug text-black/55">
+            <p className="mt-1 line-clamp-2 text-[13px] leading-snug text-foreground/55">
               {peekItem.fn}
             </p>
           </div>
@@ -170,17 +170,17 @@ export default function UseCases() {
             onClick={onClose}
             className="absolute inset-0 bg-black/70 backdrop-blur-md"
           />
-          <div className="relative z-[2] grid max-h-[88vh] w-full max-w-[760px] overflow-auto rounded-2xl border border-black/10 bg-white sm:grid-cols-[0.8fr_1fr]">
+          <div className="relative z-[2] grid max-h-[88vh] w-full max-w-[760px] overflow-auto rounded-2xl border border-border bg-panel sm:grid-cols-[0.8fr_1fr]">
             <button
               type="button"
               onClick={onClose}
               aria-label="Close"
-              className="absolute right-4 top-4 z-[3] flex h-10 w-10 items-center justify-center rounded-full border border-black/10 bg-white text-black"
+              className="absolute right-4 top-4 z-[3] flex h-10 w-10 items-center justify-center rounded-full border border-border bg-panel text-foreground"
             >
               ✕
             </button>
             {/* phone image */}
-            <div className="relative min-h-[260px] overflow-hidden border-b border-black/10 bg-[#f5f5f7] sm:border-b-0 sm:border-r sm:rounded-l-2xl">
+            <div className="relative min-h-[260px] overflow-hidden border-b border-border bg-muted sm:border-b-0 sm:border-r sm:rounded-l-2xl">
               <Image
                 src={current.img}
                 alt={`${current.k} in the Pinace wallet`}
@@ -199,21 +199,21 @@ export default function UseCases() {
                   height={42}
                   className="rounded-full"
                 />
-                <h3 className="font-heading text-2xl font-semibold tracking-tight text-black">
+                <h3 className="font-heading text-2xl font-semibold tracking-tight text-foreground">
                   {current.k}
                 </h3>
               </div>
-              <p className="mt-2 text-sm uppercase tracking-wide text-black/40">
+              <p className="mt-2 text-sm uppercase tracking-wide text-foreground/40">
                 {current.tag}
               </p>
-              <p className="mt-5 text-[15.5px] leading-relaxed text-black/60">
+              <p className="mt-5 text-[15.5px] leading-relaxed text-foreground/60">
                 {current.desc}
               </p>
               <div className="mt-6 flex flex-wrap gap-2">
                 {current.tags.map((t) => (
                   <span
                     key={t}
-                    className="rounded-full border border-black/10 px-3 py-1 font-mono text-[12px] text-black/60"
+                    className="rounded-full border border-border px-3 py-1 font-mono text-[12px] text-foreground/60"
                   >
                     {t}
                   </span>

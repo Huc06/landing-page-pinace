@@ -7,7 +7,8 @@
 /*
   Pinace landing page tokens — see ../../DESIGN.md (single source of truth).
   Palette inherited from the shipped extension (identity-preservation).
-  Theme is dark-only; we render <html class="dark">.
+  Light is the default; `.dark` (toggled by next-themes) flips only the content
+  panels. The shell/chrome (Hero, page backdrop, footer) stays dark in both.
 */
 @theme inline {
   --color-background: var(--background);
@@ -28,6 +29,11 @@
   --color-pinace-teal: var(--pinace-teal);
   --color-pinace-amber: var(--pinace-amber);
   --color-pinace-green: var(--pinace-green);
+
+  /* Section block surface — the alternating full-width panels.
+     Flips white (light) <-> near-black (dark) so the layout's rhythm holds. */
+  --color-panel: var(--panel);
+  --color-panel-foreground: var(--panel-foreground);
 
   /* shadcn semantic tokens mapped to Pinace */
   --color-card: var(--card);
@@ -58,7 +64,7 @@
 :root {
   color-scheme: dark;
 
-  /* raw brand — brighter, more saturated for a luminous, high-contrast feel */
+  /* raw brand — theme-independent */
   --pinace-blue: #2b8bff;
   --pinace-blue-bright: #5aa6ff;
   --pinace-blue-soft: #b9d6ff;
@@ -70,25 +76,49 @@
 
   --radius: 0.85rem;
 
-  /* dark theme (the only theme) — pure black for maximum contrast */
+  /* Shell / chrome — always dark in both modes (Hero, page backdrop, footer).
+     Light mode == the original look: dark shell, bright white content panels. */
   --background: #000000;
+  --primary: #2b8bff;
+  --primary-foreground: #ffffff;
+  --destructive: #ff2d6f;
+  --ring: #2b8bff;
+
+  /* ── Content tokens — LIGHT MODE (the original). Flip in .dark below. ────── */
+  --foreground: #0a0e1a; /* text inside the section panels */
+  --panel: #ffffff; /* full-width section blocks */
+  --panel-foreground: #0a0e1a;
+  --card: rgba(255, 255, 255, 0.7);
+  --card-foreground: #0a0e1a;
+  --popover: #ffffff;
+  --popover-foreground: #0a0e1a;
+  --secondary: #f0f1f4;
+  --secondary-foreground: #0a0e1a;
+  --muted: #f0f1f4;
+  --muted-foreground: #5b6172;
+  --accent: #f0f1f4;
+  --accent-foreground: #0a0e1a;
+  --border: rgba(10, 14, 26, 0.1);
+  --input: rgba(10, 14, 26, 0.14);
+}
+
+/* ── Dark mode — only the content panels flip (bg + text). Shell stays dark. ─ */
+.dark {
   --foreground: #f7faff;
+  --panel: #0d111c;
+  --panel-foreground: #f7faff;
   --card: rgba(20, 24, 38, 0.5);
   --card-foreground: #f7faff;
   --popover: #050608;
   --popover-foreground: #f5f8ff;
-  --primary: #2b8bff;
-  --primary-foreground: #ffffff;
   --secondary: #161b2c;
   --secondary-foreground: #f5f8ff;
   --muted: #161b2c;
   --muted-foreground: #aab4cf;
   --accent: #161b2c;
   --accent-foreground: #f5f8ff;
-  --destructive: #ff2d6f;
   --border: rgba(255, 255, 255, 0.12);
   --input: rgba(255, 255, 255, 0.16);
-  --ring: #2b8bff;
 }
 
 @layer base {

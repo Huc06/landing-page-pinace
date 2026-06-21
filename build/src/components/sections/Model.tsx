@@ -5,10 +5,10 @@ import { Reveal } from "@/components/common/Reveal";
 export default function Model() {
   return (
     <section id="model" className="relative scroll-mt-24">
-      {/* Full-width white block */}
-      <div className="w-full bg-white px-8 py-16 sm:px-14 sm:py-24 lg:px-20 lg:py-32">
+      {/* Full-width section block */}
+      <div className="w-full bg-panel px-8 py-16 sm:px-14 sm:py-24 lg:px-20 lg:py-32">
         {/* Section label */}
-        <h2 className="mx-auto max-w-6xl font-heading text-[clamp(2.4rem,5.5vw,4.5rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-black mb-12">
+        <h2 className="mx-auto max-w-6xl font-heading text-[clamp(2.4rem,5.5vw,4.5rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-foreground mb-12">
           What is Pinace?
         </h2>
 
@@ -35,13 +35,13 @@ export default function Model() {
 
           {/* Right — content */}
           <div>
-            <h2 className="font-heading text-[clamp(2.4rem,5vw,4.2rem)] font-bold leading-[0.95] tracking-tight text-black">
+            <h2 className="font-heading text-[clamp(2.4rem,5vw,4.2rem)] font-bold leading-[0.95] tracking-tight text-foreground">
               Delegate without
               <br />
               handing over keys
             </h2>
 
-            <p className="mt-8 max-w-xl text-[1.15rem] leading-relaxed text-black/60">
+            <p className="mt-8 max-w-xl text-[1.15rem] leading-relaxed text-foreground/60">
               Pinace is the autonomous agent wallet on Sui. Give an AI agent a
               budget and a rulebook — not your private key. On-chain policy
               enforcement, one-click revoke, all from your wallet.
@@ -49,7 +49,7 @@ export default function Model() {
 
             <a
               href="#how"
-              className="mt-10 inline-flex items-center gap-2.5 rounded-full bg-black px-7 py-4 text-[15px] font-semibold uppercase tracking-wide text-white transition-transform hover:scale-105"
+              className="mt-10 inline-flex items-center gap-2.5 rounded-full bg-foreground px-7 py-4 text-[15px] font-semibold uppercase tracking-wide text-white dark:text-[#0a0e1a] transition-transform hover:scale-105"
             >
               <span>start now</span>
               <ArrowUpRight className="size-5" />

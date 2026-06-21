@@ -5,11 +5,11 @@ import { sdkSnippet, sdkTiers, site } from "@/lib/site";
 export default function Developers() {
   return (
     <section id="developers" className="relative scroll-mt-24">
-      {/* Full-width white block */}
-      <div className="w-full bg-white px-8 py-16 sm:px-14 sm:py-24 lg:px-20 lg:py-32">
+      {/* Full-width section block */}
+      <div className="w-full bg-panel px-8 py-16 sm:px-14 sm:py-24 lg:px-20 lg:py-32">
         {/* Left-aligned heading */}
         <div className="mx-auto max-w-6xl">
-          <h2 className="font-heading text-[clamp(2.4rem,5.5vw,4.5rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-black">
+          <h2 className="font-heading text-[clamp(2.4rem,5.5vw,4.5rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-foreground">
             <span className="block">For developers.</span>
             <span className="block text-[#a974ff]">
               Bounded actions in a few lines.
@@ -53,12 +53,12 @@ export default function Developers() {
                       )}
                     </p>
                     {!published && (
-                      <span className="rounded-full border border-black/10 bg-black/[0.04] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-black/35">
+                      <span className="rounded-full border border-border bg-foreground/[0.04] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-foreground/40">
                         Coming soon
                       </span>
                     )}
                   </div>
-                  <p className="mt-1.5 text-[15px] text-black/60">{t.who}</p>
+                  <p className="mt-1.5 text-[15px] text-foreground/60">{t.who}</p>
                 </>
               );
 
@@ -68,15 +68,15 @@ export default function Developers() {
                   href={(t as { href: string }).href}
                   target="_blank"
                   rel="noreferrer"
-                  className="group rounded-xl border border-black/10 bg-[#f5f5f7] p-6 transition-colors hover:bg-[#ededf0]"
+                  className="group rounded-xl border border-border bg-foreground/[0.04] p-6 transition-colors hover:bg-foreground/[0.07]"
                 >
                   {card}
                 </a>
               ) : (
                 <div
                   key={t.pkg}
-                  className={`rounded-xl border border-black/10 bg-[#f5f5f7] p-6 ${
-                    published ? "transition-colors hover:bg-[#ededf0]" : "opacity-60"
+                  className={`rounded-xl border border-border bg-foreground/[0.04] p-6 ${
+                    published ? "transition-colors hover:bg-foreground/[0.07]" : "opacity-60"
                   }`}
                 >
                   {card}
