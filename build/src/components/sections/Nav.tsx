@@ -53,9 +53,20 @@ export default function Nav() {
           )}
         />
 
-        {/* Center — Navigation links (desktop), absolutely centered so it's
-            unaffected by the differing widths of the left/right items */}
-        <nav className="hidden items-center gap-8 md:absolute md:left-1/2 md:top-1/2 md:flex md:-translate-x-1/2 md:-translate-y-1/2">
+        {/* Center — Navigation links (desktop) wrapped in a frosted
+            white pill. Background opacity bumps when the page is
+            scrolled (`scrolled`) so the links stay legible over
+            light content underneath. Stays absolutely centred so
+            left/right items can shift width without affecting it. */}
+        <nav
+          className={cn(
+            "hidden md:absolute md:left-1/2 md:top-1/2 md:flex md:-translate-x-1/2 md:-translate-y-1/2",
+            "items-center gap-7 rounded-full border px-5 py-2 backdrop-blur-md transition-colors duration-300",
+            scrolled
+              ? "border-black/8 bg-white/85 shadow-[0_8px_24px_-12px_rgba(0,0,0,0.18)]"
+              : "border-white/12 bg-white/8 shadow-[0_8px_30px_-12px_rgba(255,255,255,0.18)]",
+          )}
+        >
           {navLinks.map((item) => (
             <a
               key={item.href}
