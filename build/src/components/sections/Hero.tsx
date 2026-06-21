@@ -48,15 +48,28 @@ export default function Hero() {
           Pinace
         </motion.h1>
 
-        {/* Subheadline */}
+        {/* Moat — short, sharp distinction vs every other "autonomous
+            agent wallet" out there. Rendered above the supporting
+            copy as the line a skim-reader will remember. */}
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35, duration: 0.5 }}
+          className="max-w-2xl font-[family-name:var(--font-instrument-sans)] text-xl sm:text-2xl font-medium leading-[1.35] text-white"
+        >
+          Other agent wallets hand the AI your keys.{" "}
+          <span className="text-[#85a8ff]">Pinace hands it a budget.</span>
+        </motion.p>
+
+        {/* Supporting */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.7 }}
-          transition={{ delay: 0.4, duration: 0.6 }}
-          className="max-w-xl font-[family-name:var(--font-instrument-sans)] text-lg sm:text-[20px] leading-[1.65] text-white"
+          transition={{ delay: 0.5, duration: 0.6 }}
+          className="max-w-xl font-[family-name:var(--font-instrument-sans)] text-base sm:text-lg leading-[1.65] text-white"
         >
-          Give an AI agent a budget and a rulebook, not your private key.
-          On-chain policy enforcement, one-click revoke, built on Sui.
+          On-chain policy enforcement, one-click revoke, never
+          custodial — built on Sui Move.
         </motion.p>
 
         {/* CTA Buttons */}

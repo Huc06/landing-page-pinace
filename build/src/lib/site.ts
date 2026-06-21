@@ -27,7 +27,9 @@ export const hero = {
   // headline is rendered as reveal rows; last word is the drenched-blue accent.
   headlineRows: ["Let AI trade", "for you — without", "handing over"],
   headlineAccent: "your keys.",
-  sub: "Give an AI agent a budget and a rulebook, not your private key. Pinace keeps funds in your on-chain pool, enforces every limit with Move, and lets you revoke access in one click.",
+  // The moat — same line surfaces in the hero + on the docs home.
+  moat: "Other agent wallets hand the AI your keys. Pinace hands it a budget.",
+  sub: "On-chain policy enforcement, one-click revoke, never custodial — built on Sui Move. Funds stay in your pool; agents act inside the bounds you set.",
   primaryCta: { label: "Add to Chrome", href: "#install" },
   secondaryCta: { label: "View docs", href: "#developers" },
 } as const;

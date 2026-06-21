@@ -48,11 +48,14 @@ export default function HomePage() {
         AI agents that trade for users,{' '}
         <span className="text-gradient">never holding their keys</span>
       </h1>
-      <p className="mt-5 max-w-xl text-center text-fd-muted-foreground sm:text-lg">
-        Pinace is the autonomous-agent wallet on Sui. Build chat
-        agents, MCP servers, or DeFi automations against one
-        policy-bounded surface — funds stay in the user&apos;s pool,
-        every action is reversible on chain.
+      <p className="mt-4 max-w-2xl text-center text-fd-foreground sm:text-xl font-medium">
+        Other agent wallets hand the AI your keys.{' '}
+        <span className="text-gradient">Pinace hands it a budget.</span>
+      </p>
+      <p className="mt-3 max-w-xl text-center text-fd-muted-foreground sm:text-base">
+        On-chain policy enforcement, one-click revoke, never
+        custodial — built on Sui Move. Funds stay in the user&apos;s
+        pool; agents act inside the bounds you set.
       </p>
 
       <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
