@@ -1,0 +1,118 @@
+---
+title: REST endpoints
+description: Every Pinace Indexer endpoint, with input + response shape.
+---
+
+Base: `https://fenik.one` (production). All endpoints return JSON
+with the shape `{ data, ... }` or `{ error }` on failure.
+
+## `GET /health`
+
+Liveness probe. Returns `{ status: 'ok', version }`.
+
+## `GET /pools/:poolId`
+
+Single pool snapshot.
+
+```ts
+{
+  poolId: string;
+  owner: string;
+  network: 'testnet' | 'mainnet';
+  balances: Array<{ coinType: string; amount: string }>; // raw atomic
+  createdAt: number; // ms
+  lastUpdatedAt: number;
+}
+```
+
+## `GET /agents`
+
+List agents, filterable.
+
+```sh
+# All active agents for an owner
+curl 'https://fenik.one/agents?owner=0xf167...&status=active'
+
+# All agents on a pool (any status)
+curl 'https://fenik.one/agents?poolId=0xabc'
+```
+
+Returns:
+
+```ts
+{
+  data: Array<{
+    id: string;             // indexer uuid
+    address: string;        // agent's on-chain address
+    poolId: string;
+    owner: string;
+    status: 'active' | 'revoked';
+    actionCount: number;
+    connectedAt: number;
+    revokedAt?: number;
+  }>;
+  total: number;
+}
+```
+
+## `GET /agents/:id`
+
+Single agent with its attached policies (denormalised config). This
+is what the wallet's Agent Detail page reads.
+
+```ts
+{
+  ...agentSummary,
+  policies: Array<{
+    id: string;
+    policyType: string;      // full Move type: "0x...::spending_limit_policy::Witness"
+    status: 'attached' | 'detached';
+    config?: Record<string, unknown>; // denormalised; for spending_limit: { max_per_tx, max_per_window, window_ms, spent_in_window, window_started_ms }
+    attachedAt: number;
+    updatedAt?: number;
+  }>;
+}
+```
+
+## `GET /actions`
+
+Action history (every `propose_action` settles into a row).
+
+```sh
+curl 'https://fenik.one/actions?poolId=0xabc&limit=20'
+curl 'https://fenik.one/actions?owner=0xf167...&limit=5'
+```
+
+```ts
+{
+  data: Array<{
+    id: string;
+    poolId: string;
+    agentAddress: string;
+    nonce: string;          // bigint as string
+    kind: 'swap' | 'unknown';
+    amountIn: string;       // raw atomic
+    minAmountOut: string;
+    quotedAmountOut?: string;
+    settlementStatus: 'settled' | 'pending' | 'reverted' | null;
+    txDigest: string;
+    proposedAt: number;
+    settledAt?: number;
+  }>;
+  total: number;
+}
+```
+
+## `GET /owners/:address`
+
+Aggregate over the owner's pools + agents — what the wallet's Home
+dashboard reads.
+
+## `GET /timeline?agent=:address`
+
+Action milestones for one agent (used by Fenik's AgentTimeline
+card). Returns `{ data: AgentTimeline }`.
+
+## `GET /docs`, `GET /openapi`
+
+Self-hosted API docs + raw OpenAPI 3 spec. Useful for codegen.

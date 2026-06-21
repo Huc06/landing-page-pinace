@@ -1,0 +1,128 @@
+---
+title: Examples
+description: Copy-paste recipes for the most common Pinace SDK flows.
+---
+
+## 1. Owner: create a pool + fund it
+
+```ts
+import { Transaction } from '@mysten/sui/transactions';
+import { buildCreatePool, PACKAGE_IDS, getSuiClient } from '@pinace/core';
+
+const tx = new Transaction();
+
+buildCreatePool({ tx, packageId: PACKAGE_IDS.testnet });
+
+// Move 0.5 SUI from the owner wallet into the pool in the same PTB.
+const [coin] = tx.splitCoins(tx.gas, [tx.pure.u64(500_000_000n)]);
+tx.moveCall({
+  target: `${PACKAGE_IDS.testnet}::balance_pool::deposit`,
+  typeArguments: ['0x2::sui::SUI'],
+  arguments: [/* poolId result from buildCreatePool */, coin],
+});
+
+const sui = getSuiClient('testnet');
+const result = await sui.signAndExecuteTransaction({
+  transaction: tx,
+  signer: ownerKeypair,
+  include: { effects: true },
+});
+```
+
+## 2. Owner: attach a 0.1 SUI/tx, 1 SUI/h policy to an agent
+
+```ts
+import { buildAttachPolicy, PACKAGE_IDS } from '@pinace/core';
+import { spendingLimit } from '@pinace/core/policies';
+
+const tx = new Transaction();
+buildAttachPolicy({
+  tx,
+  packageId: PACKAGE_IDS.testnet,
+  poolId,
+  agentAddress,
+  policy: spendingLimit({
+    maxPerTx: 100_000_000n,
+    maxPerWindow: 1_000_000_000n,
+    windowMs: 60n * 60n * 1000n,
+  }),
+});
+await sui.signAndExecuteTransaction({ transaction: tx, signer: ownerKeypair });
+```
+
+## 3. Agent: build + sign a DeepBook swap
+
+(Browser; Pinace Wallet signs.)
+
+```ts
+import { Transaction } from '@mysten/sui/transactions';
+import {
+  ActionKind,
+  buildProposeAction,
+  buildSettleAction,
+  PACKAGE_IDS,
+} from '@pinace/core';
+import { buildPolicyProves, spendingLimit } from '@pinace/core/policies';
+
+const tx = new Transaction();
+tx.setSenderIfNotSet(agentAddress);
+
+const request = buildProposeAction({
+  tx,
+  packageId: PACKAGE_IDS.testnet,
+  poolId,
+  kind: ActionKind.Swap,
+  coinInType: WSUI_TYPE,
+  coinOutType: WUSDC_TYPE,
+  amountIn: 50_000_000n,
+  minAmountOut: 31_000n,
+  deadlineMs: BigInt(Date.now() + 5 * 60_000),
+});
+buildPolicyProves({ tx, packageId: PACKAGE_IDS.testnet, poolId, request, policies: [spendingLimit()] });
+// ... take_coin → deepbook::swap → return_coin ...
+buildSettleAction({ tx, packageId: PACKAGE_IDS.testnet, poolId, request });
+
+const wallet = useWallets().find((w) => w.name === 'Pinace Wallet');
+const { digest } = await wallet
+  .features['pinace:signAndExecuteAsAgent']
+  .signAndExecute({ transaction: tx });
+```
+
+## 4. Read all active agents on a pool
+
+Via the indexer (preferred):
+
+```sh
+curl 'https://fenik.one/agents?poolId=0xabc&status=active'
+```
+
+Via `@pinace/core` (fallback):
+
+```ts
+import { PinaceClient, getSuiClient } from '@pinace/core';
+
+const client = new PinaceClient({ sui: getSuiClient('testnet'), network: 'testnet' });
+const pool = await client.getPool(poolId);
+const agents = pool.policies
+  .map((p) => p.agentAddress)
+  .filter((v, i, a) => a.indexOf(v) === i);
+```
+
+## 5. Owner: revoke an agent
+
+```ts
+import { buildRevokeAgent, PACKAGE_IDS } from '@pinace/core';
+
+const tx = new Transaction();
+buildRevokeAgent({
+  tx,
+  packageId: PACKAGE_IDS.testnet,
+  poolId,
+  agentAddress,
+});
+
+await sui.signAndExecuteTransaction({ transaction: tx, signer: ownerKeypair });
+```
+
+The agent's next `propose_action` aborts with `E_REVOKED`. See
+[Revocation](/docs/concepts/revocation).

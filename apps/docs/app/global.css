@@ -1,0 +1,92 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+
+/* ============================================================
+   Pinace docs theme — matches the wallet extension + landing
+   colour system. Deep navy canvas (#05080f), Pinace blue
+   (#006FEE / #3054ff), sky highlight (#7AA0FF).
+   ============================================================ */
+:root {
+  --color-fd-background: #fafafa;
+  --color-fd-foreground: #05080f;
+  --color-fd-primary: #006fee;
+  --color-fd-primary-foreground: #ffffff;
+  --color-fd-secondary: #f1f4fb;
+  --color-fd-secondary-foreground: #05080f;
+  --color-fd-muted: #f1f4fb;
+  --color-fd-muted-foreground: #6b7280;
+  --color-fd-accent: #e6efff;
+  --color-fd-accent-foreground: #003a8c;
+  --color-fd-card: #ffffff;
+  --color-fd-card-foreground: #05080f;
+  --color-fd-popover: #ffffff;
+  --color-fd-popover-foreground: #05080f;
+  --color-fd-border: rgba(5, 8, 15, 0.10);
+  --color-fd-ring: #3054ff;
+}
+
+.dark {
+  --color-fd-background: #05080f;
+  --color-fd-foreground: #fafafa;
+  --color-fd-primary: #7aa0ff;
+  --color-fd-primary-foreground: #05080f;
+  --color-fd-secondary: #0d1220;
+  --color-fd-secondary-foreground: #fafafa;
+  --color-fd-muted: #0d1220;
+  --color-fd-muted-foreground: #9aa3b2;
+  --color-fd-accent: #122036;
+  --color-fd-accent-foreground: #fafafa;
+  --color-fd-card: #0a0f1d;
+  --color-fd-card-foreground: #fafafa;
+  --color-fd-popover: #0d1220;
+  --color-fd-popover-foreground: #fafafa;
+  --color-fd-border: rgba(255, 255, 255, 0.08);
+  --color-fd-ring: #7aa0ff;
+}
+
+body {
+  font-family: var(--font-sans), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+code, pre, kbd, .font-mono {
+  font-family: var(--font-mono), ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+/* Brand flourishes — gradient hero title + soft sky glow. */
+.text-gradient {
+  background: linear-gradient(96deg, #006fee 0%, #3054ff 35%, #7aa0ff 70%, #b0c8ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.bg-glow {
+  background-image: radial-gradient(
+    120% 140% at 50% -20%,
+    rgba(48, 84, 255, 0.32) 0%,
+    rgba(5, 8, 15, 0) 60%
+  );
+}
+
+/* Status pill helpers for the integrations list. */
+.pill-live {
+  background: rgba(34, 197, 94, 0.12);
+  color: #4ade80;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+.pill-planned {
+  background: rgba(122, 160, 255, 0.10);
+  color: #7aa0ff;
+  border: 1px solid rgba(122, 160, 255, 0.28);
+}
+.pill-roadmap {
+  background: rgba(251, 191, 36, 0.10);
+  color: #fbbf24;
+  border: 1px solid rgba(251, 191, 36, 0.28);
+}
+
+html { scrollbar-gutter: stable; }
+html > body[data-scroll-locked] {
+  margin-right: 0px !important;
+  --removed-body-scroll-bar-size: 0px !important;
+}

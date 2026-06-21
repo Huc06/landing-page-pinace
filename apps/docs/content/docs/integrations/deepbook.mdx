@@ -1,0 +1,93 @@
+---
+title: DeepBook v3
+description: Pinace's reference integration. The wallet's swap flow and Fenik's chat agent both route here.
+---
+
+[DeepBook v3](https://deepbook.tech) is Sui's central limit
+order-book DEX. It's the first venue Pinace integrated and the
+reference for how a venue plugs in. Fenik (the chat agent demo) and
+the wallet's own quote UI both call DeepBook through the same SDK
+builder.
+
+## What an agent does on DeepBook
+
+```ts
+import { DeepBookClient } from '@mysten/deepbook-v3';
+
+const dbClient = new DeepBookClient({ network: 'testnet' });
+
+// 1. Quote (off-chain estimate)
+const quote = await dbClient.getQuote({
+  pool: 'WSUI_WUSDC',
+  side: 'base_to_quote',
+  amountIn: 50_000_000n,
+});
+
+// 2. Build the swap call inside the Pinace action PTB
+const coinIn = tx.moveCall({
+  target: `${PACKAGE_IDS.testnet}::balance_pool::take_coin`,
+  typeArguments: [WSUI_TYPE],
+  arguments: [tx.object(poolId), request],
+});
+
+const [coinOut, coinInRemainder, deepRemainder] = dbClient.placeSwap({
+  tx, pool: 'WSUI_WUSDC',
+  coinIn,
+  minAmountOut: 31_000n,
+  side: 'base_to_quote',
+  deepCoin: tx.moveCall({ target: '0x2::coin::zero', typeArguments: [DEEP_TYPE], arguments: [] }),
+});
+
+tx.moveCall({
+  target: `${PACKAGE_IDS.testnet}::balance_pool::return_coin`,
+  typeArguments: [WUSDC_TYPE],
+  arguments: [tx.object(poolId), request, coinOut],
+});
+
+// Pool also returns any unused input + DEEP dust to the agent address
+tx.transferObjects([coinInRemainder, deepRemainder], tx.pure.address(agentAddress));
+```
+
+## Policy combination Pinace recommends
+
+- **`spending_limit_policy`** — required. Caps `amount_in` per tx +
+  per window. Without this `propose_action` aborts with
+  `EEmptyPolicySet`.
+- **`slippage_guard_policy`** (planned) — caps how far the executed
+  price may move off the quoted mid-price. Today we mitigate this
+  client-side by setting `minAmountOut` from the quote × `(1 - slippageBps)`.
+- **`token_whitelist_policy`** — useful if you want the agent
+  scoped to one pair only. Hidden in UI today (treated as "any
+  supported pair") but the on-chain policy is wired.
+
+## Supported pools on testnet
+
+| Pair | Pool key | Notes |
+| --- | --- | --- |
+| `SUI` / `DBUSDC` | `SUI_DBUSDC` | Thin order-book — use small sizes. |
+| `WSUI` / `WUSDC` | `WSUI_WUSDC` | Reference pool in Fenik. |
+| `WDEEP` / `WUSDC` | `WDEEP_WUSDC` | DEEP token swaps. |
+
+## DEEP fees
+
+Every DeepBook trade burns a small DEEP fee. Two options:
+
+1. **DEEP-in pool** — pool holds DEEP, agent passes a non-zero DEEP
+   coin to `placeSwap`. Wallet currently uses this; owner tops up
+   the pool with DEEP once (via `scripts/topup-deep.mts` or a
+   manual transfer).
+2. **Input-fee mode** — DeepBook deducts the equivalent fee from
+   the input coin if you pass `coin::zero<DEEP>`. Cleaner; we'll
+   move to this in a future SDK release.
+
+## Common Move abort codes
+
+When you see `Transaction reverted on chain: MoveAbort in Nth command, abort code: X`:
+
+| Module | Code | Meaning |
+| --- | --- | --- |
+| `spending_limit_policy::prove` | `101` | `amount_in > max_per_tx` |
+| `spending_limit_policy::prove` | `102` | `spent_in_window + amount_in > max_per_window` |
+| `balance_pool::assert_deadline` | `15` | Sign popup left open past the `deadline_ms` — Pinace builds with a 5-minute deadline. |
+| `balance_pool::take_coin` | `22` / `30` | Wallet built the PTB against a different package than the pool was created with. Bump `@pinace/core`. |
+| DeepBook (4th-ish command) | `31` (`EInsufficientOutput`) | Quote stale or order-book thin — slippage protection kicked in. |

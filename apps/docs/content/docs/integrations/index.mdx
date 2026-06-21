@@ -1,0 +1,78 @@
+---
+title: Integrations
+description: Sui ecosystem venues you can build agents on top of with Pinace. DeepBook is live today; Cetus, Scallop, Aftermath, NAVI and more are on the roadmap.
+---
+
+Pinace is venue-agnostic at the protocol level — anything you can
+build as one Sui Move call is an integration candidate. Today the
+agent shipped (Fenik) trades on **DeepBook v3**. The next wave of
+venues lights up as their teams plug in.
+
+## Status legend
+
+<div className="my-6 flex flex-wrap gap-3 text-xs font-medium">
+  <span className="pill-live rounded-full px-3 py-1">● Live (testnet)</span>
+  <span className="pill-planned rounded-full px-3 py-1">● Next up</span>
+  <span className="pill-roadmap rounded-full px-3 py-1">● On the roadmap</span>
+</div>
+
+## DEX & spot trading
+
+| Venue | Status | What an agent does |
+| --- | --- | --- |
+| <a href="https://deepbook.tech" target="_blank" rel="noreferrer">**DeepBook v3**</a> | <span className="pill-live rounded-full px-2 py-0.5">live</span> | Limit + market swaps. Reference integration in Fenik. |
+| <a href="https://www.cetus.zone" target="_blank" rel="noreferrer">**Cetus**</a> | <span className="pill-planned rounded-full px-2 py-0.5">next up</span> | Concentrated-liquidity swaps, position rebalancing inside a policy budget. |
+| <a href="https://aftermath.finance" target="_blank" rel="noreferrer">**Aftermath**</a> | <span className="pill-planned rounded-full px-2 py-0.5">next up</span> | Aggregator routes, stable-pool swaps. |
+| <a href="https://www.kriya.finance" target="_blank" rel="noreferrer">**Kriya**</a> | <span className="pill-roadmap rounded-full px-2 py-0.5">roadmap</span> | Perpetual / spot pairs. |
+
+## Lending & borrowing
+
+| Venue | Status | What an agent does |
+| --- | --- | --- |
+| <a href="https://www.scallop.io" target="_blank" rel="noreferrer">**Scallop**</a> | <span className="pill-planned rounded-full px-2 py-0.5">next up</span> | Supply / repay loops inside a borrowing-cap policy. |
+| <a href="https://suilend.fi" target="_blank" rel="noreferrer">**SuiLend**</a> | <span className="pill-roadmap rounded-full px-2 py-0.5">roadmap</span> | Multi-collateral lending positions. |
+| <a href="https://www.navi.fi" target="_blank" rel="noreferrer">**NAVI**</a> | <span className="pill-planned rounded-full px-2 py-0.5">next up</span> | Lending vaults + liquidation guards. |
+
+## Yield & staking
+
+| Venue | Status | What an agent does |
+| --- | --- | --- |
+| <a href="https://haedal.xyz" target="_blank" rel="noreferrer">**Haedal**</a> | <span className="pill-roadmap rounded-full px-2 py-0.5">roadmap</span> | Liquid staking (haSUI) — re-stake yield. |
+| <a href="https://bucketprotocol.io" target="_blank" rel="noreferrer">**Bucket**</a> | <span className="pill-roadmap rounded-full px-2 py-0.5">roadmap</span> | CDP positions, stablecoin minting. |
+| **Walrus** (storage) | <span className="pill-roadmap rounded-full px-2 py-0.5">roadmap</span> | Agent persistence layer for prompt history, conversation context. |
+
+<Callout type="info">
+  **Want your venue here?** Read [Adding a venue](#adding-a-venue)
+  below. Or open a PR on
+  [pinace-wallet/frontend](https://github.com/pinace-wallet/frontend)
+  — venue support is mostly an SDK builder + a policy mapping.
+</Callout>
+
+## Cross-cutting infra
+
+These show up under every integration:
+
+- **zkLogin** (planned) — onboard owners with Google / Apple, no
+  seed phrase.
+- **Enoki** (planned) — sponsor agent gas so users don't top up the
+  agent address themselves.
+- **Pyth / Switchboard** — oracle reads for limit-order conditions
+  in custom policies.
+
+## Adding a venue
+
+A new venue ships as **three pieces**:
+
+1. **SDK builder** in `@pinace/core` (or a side package): one
+   function that takes a `Transaction` + venue args, returns the
+   `Coin<U>` your `return_coin` step expects.
+2. **Policy mapping**: declare which existing policies gate this
+   venue (`spending_limit` is always required; `slippage_guard` and
+   `token_whitelist` are common; some venues need a venue-specific
+   one).
+3. **Wallet adapter** (optional but recommended): a small UI patch
+   that lets the wallet's Quote / Plan cards pre-flight against the
+   venue's quote API before the user signs.
+
+PRs welcome. Each venue page below documents the action shape and
+policy combination Pinace recommends.

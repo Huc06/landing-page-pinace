@@ -1,0 +1,12 @@
+{
+  "title": "SDK",
+  "pages": [
+    "overview",
+    "installation",
+    "package-ids",
+    "build-propose-action",
+    "policies",
+    "read-client",
+    "examples"
+  ]
+}

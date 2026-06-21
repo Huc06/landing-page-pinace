@@ -1,0 +1,139 @@
+---
+title: Policies (SDK)
+description: Compose policy configs, attach them to a pool, prove them inside an action PTB.
+---
+
+Two surfaces live in `@pinace/core/policies`:
+
+1. **Config builders** — small typed helpers that emit the BCS-
+   serialisable `Config` struct each policy expects.
+2. **Prove builders** — add the right `<witness>::prove(...)` move
+   call to a transaction.
+
+## Spending limit
+
+### Attach
+
+```ts
+import { Transaction } from '@mysten/sui/transactions';
+import {
+  buildAttachPolicy,
+  PACKAGE_IDS,
+} from '@pinace/core';
+import { spendingLimit } from '@pinace/core/policies';
+
+const tx = new Transaction();
+
+buildAttachPolicy({
+  tx,
+  packageId: PACKAGE_IDS.testnet,
+  poolId,
+  agentAddress,
+  policy: spendingLimit({
+    maxPerTx: 100_000_000n,      // 0.1 SUI
+    maxPerWindow: 1_000_000_000n, // 1 SUI
+    windowMs: 60n * 60n * 1000n,  // 1h
+  }),
+});
+
+const { digest } = await client.signAndExecuteTransaction({
+  transaction: tx,
+  signer: ownerKeypair,
+});
+```
+
+### Prove (inside an action PTB)
+
+```ts
+import { buildPolicyProves } from '@pinace/core/policies';
+
+buildPolicyProves({
+  tx,
+  packageId: PACKAGE_IDS.testnet,
+  poolId,
+  request,                       // the hot-potato from propose_action
+  policies: [spendingLimit()],   // no config — prove reads on-chain state
+});
+```
+
+`spendingLimit()` without args returns a "prove" descriptor. With
+args it returns a "config" descriptor used by `buildAttachPolicy`.
+
+### Update
+
+```ts
+import { buildUpdatePolicy } from '@pinace/core';
+
+buildUpdatePolicy({
+  tx,
+  packageId: PACKAGE_IDS.testnet,
+  poolId,
+  agentAddress,
+  policy: spendingLimit({
+    maxPerTx: 200_000_000n,
+    maxPerWindow: 2_000_000_000n,
+    windowMs: 60n * 60n * 1000n,
+  }),
+});
+```
+
+Owner signs. The on-chain config is replaced; the running window
+counter is reset (treated as a new policy).
+
+### Detach
+
+```ts
+import { buildDetachPolicy } from '@pinace/core';
+import { spendingLimitWitness } from '@pinace/core/policies';
+
+buildDetachPolicy({
+  tx,
+  packageId: PACKAGE_IDS.testnet,
+  poolId,
+  agentAddress,
+  witness: spendingLimitWitness,
+});
+```
+
+## Multiple policies on one agent
+
+Just chain them — every policy must `prove` before `settle`:
+
+```ts
+buildPolicyProves({
+  tx,
+  packageId: PACKAGE_IDS.testnet,
+  poolId,
+  request,
+  policies: [spendingLimit(), slippageGuard(), timeWindow()],
+});
+```
+
+The order doesn't matter for correctness (each call adds its own
+receipt), but conventionally we put the cheapest checks first so
+abort failures fail fast.
+
+## Writing a custom policy SDK helper
+
+If you've shipped a Move policy of your own:
+
+```ts
+import { definePolicy } from '@pinace/core/policies';
+
+export const cooldown = definePolicy<{ cooldownMs: bigint }>({
+  witnessTarget: '0xMY_PKG::cooldown_policy::Witness',
+  configBcs: bcs.struct('CooldownConfig', {
+    last_action_ms: bcs.u64(),
+    cooldown_ms: bcs.u64(),
+  }),
+  proveTarget: '0xMY_PKG::cooldown_policy::prove',
+  toConfig: ({ cooldownMs }) => ({
+    last_action_ms: 0n,
+    cooldown_ms: cooldownMs,
+  }),
+});
+```
+
+Then it composes the same way as `spendingLimit()` —
+`buildAttachPolicy({ policy: cooldown({ cooldownMs: 30_000n }) })`
+and `buildPolicyProves({ policies: [cooldown()] })`.

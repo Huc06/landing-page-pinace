@@ -5,7 +5,10 @@ export const site = {
   name: "Pinace",
   tagline: "The Autonomous Agent Wallet on Sui",
   chromeStoreUrl: "#install",
-  docsUrl: "#developers",
+  // Live fumadocs site (deployed from apps/docs). Falls back to the
+  // in-page Developers section in dev when the docs subdomain isn't
+  // up — override via NEXT_PUBLIC_DOCS_URL.
+  docsUrl: process.env.NEXT_PUBLIC_DOCS_URL ?? "https://docs.fenik.one",
   githubUrl: "https://github.com/pinace-wallet",
   // Fenik — Pinace's reference agent POC. Conversational chat app
   // that runs bounded DeepBook swaps via @pinace/agent-sdk. Lives on

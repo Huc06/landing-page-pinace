@@ -1,0 +1,42 @@
+---
+title: Cetus
+description: Concentrated-liquidity DEX on Sui. Next-up venue for Pinace — swaps + position rebalancing within a policy budget.
+---
+
+<Callout type="warn">
+  **Status: planned.** Cetus integration is on the next-wave list.
+  This page sketches the action shape so venue + SDK teams can pre-align.
+</Callout>
+
+## What an agent will do on Cetus
+
+- **Spot swaps** through Cetus's CLMM pools (`router::swap_in`).
+- **LP position management** — open / close / rebalance positions
+  bounded by spending limit + slippage policy.
+
+## Policies that apply
+
+- `spending_limit_policy` — required.
+- `slippage_guard_policy` — strongly recommended; CLMM prices move
+  fast inside narrow ranges.
+- A future `lp_band_policy` — bounds how far the agent can move a
+  position from its current range. Spec in progress.
+
+## Target SDK shape
+
+```ts
+import { buildCetusSwap } from '@pinace/cetus'; // future side package
+
+const coinOut = buildCetusSwap({
+  tx, packageId: PACKAGE_IDS.testnet, request,
+  poolId: CETUS_POOL.SUI_USDC,
+  coinIn,
+  minAmountOut,
+  sqrtPriceLimit,
+});
+```
+
+## Links
+
+- [Cetus docs](https://cetus-1.gitbook.io/cetus-docs)
+- [Cetus SDK](https://www.npmjs.com/package/@cetusprotocol/cetus-sui-clmm-sdk)

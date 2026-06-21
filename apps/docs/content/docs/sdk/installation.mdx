@@ -1,0 +1,57 @@
+---
+title: Installation
+description: Install @pinace/core and its peer @mysten/sui, set up a signer, and verify the version.
+---
+
+## Install
+
+```sh
+npm install @pinace/core @mysten/sui @mysten/deepbook-v3
+```
+
+`@mysten/sui` is a peer of `@pinace/core` (we don't bundle it; you
+pick the version). `@mysten/deepbook-v3` is only needed if you're
+calling DeepBook directly inside the action PTB — Pinace doesn't
+ship that wrapper itself.
+
+## Bring a signer
+
+The SDK never reads keys from disk. You decide where the secret
+lives — local Ed25519, agent address from the wallet, MCP key, or a
+raw signer for testnet.
+
+```ts
+import { Ed25519Keypair } from '@mysten/sui/keypairs/ed25519';
+
+// dev — from env. Don't do this in prod.
+const keypair = Ed25519Keypair.fromSecretKey(process.env.OWNER_SECRET_KEY!);
+const ownerAddress = keypair.getPublicKey().toSuiAddress();
+```
+
+In the browser, you'll usually let Pinace Wallet sign for you:
+
+```ts
+import { useSuiClient, useWallets } from '@mysten/dapp-kit';
+
+const wallet = useWallets().find((w) => w.name === 'Pinace Wallet');
+const result = await wallet?.features['pinace:signAndExecuteAsAgent']
+  ?.signAndExecute({ transaction: tx });
+```
+
+## Verify the version
+
+```ts
+import { PACKAGE_IDS, version } from '@pinace/core';
+
+console.log(version);                      // "0.5.x"
+console.log(PACKAGE_IDS.testnet);          // "0x5be5ab..." (current)
+```
+
+If `PACKAGE_IDS.testnet` doesn't match what your wallet build is
+pointing at, the next `propose_action` will revert with
+`TypeMismatch` because the pool object's type prefix won't match the
+PTB target.
+
+`pnpm dedupe @mysten/sui` can save you a few hours if you see weird
+`TypeMismatch` errors at command index 0 — duplicate `sui` installs
+sometimes ship slightly different BCS schemas.

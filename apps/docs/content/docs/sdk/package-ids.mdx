@@ -1,0 +1,65 @@
+---
+title: PACKAGE_IDS
+description: Where the Pinace Move package lives on each network. Always read from the SDK constant — it advances with every release.
+---
+
+```ts
+import { PACKAGE_IDS, getPackageId, type PinaceNetwork } from '@pinace/core';
+
+PACKAGE_IDS.testnet;                     // current testnet pkg
+PACKAGE_IDS.mainnet;                     // mainnet (coming)
+getPackageId('testnet');                 // same thing, function-style
+```
+
+| Network | Status | Notes |
+| --- | --- | --- |
+| `testnet` | live | Updated whenever a breaking Move change ships. Read from the SDK, never hardcode. |
+| `mainnet` | not yet | Will land after the integrations roadmap stabilises. |
+| `devnet` | not supported | Sui devnet resets weekly; we don't track it. |
+
+## Why this matters
+
+`BalancePool` objects encode the package they were created against
+in their `type`:
+
+```
+0x5be5ab02…2a751a23b::balance_pool::BalancePool
+^^^^^^^^^^^^^^^^^^^
+    package id
+```
+
+Once a new package ships, **old pools created against the previous
+package can't host new actions** — `propose_action` aborts because
+the wrapper PTB targets the new package but the pool's actual type
+is from the old one.
+
+The Pinace Wallet handles this for you (it dedupes by package and
+hides stale pools), but if you script directly via `@pinace/core` and
+you're seeing `CommandArgumentError { kind: TypeMismatch }` at
+command index 0 — that's almost always a package mismatch. Read the
+pool's on-chain `type`, compare the prefix to `PACKAGE_IDS[network]`.
+
+```ts
+import { SuiGrpcClient } from '@mysten/sui/grpc';
+import { PACKAGE_IDS } from '@pinace/core';
+
+const client = new SuiGrpcClient({
+  network: 'testnet',
+  baseUrl: 'https://fullnode.testnet.sui.io:443',
+});
+const { object } = await client.getObject({ objectId: poolId });
+const onChainPkg = (object?.type ?? '').split('::')[0];
+
+console.log(onChainPkg === PACKAGE_IDS.testnet ? 'match' : 'mismatch — recreate pool');
+```
+
+## Migration playbook
+
+When the package bumps:
+
+1. SDK release → new `PACKAGE_IDS[network]` value.
+2. Wallet release picks up the new SDK → starts treating old pools
+   as stale (hides them from the active list).
+3. Owner deposits into a fresh pool (one tx). Old pools stay
+   visible only on the legacy path so users can withdraw remaining
+   funds — they're not lost.

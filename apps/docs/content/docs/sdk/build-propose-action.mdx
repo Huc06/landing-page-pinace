@@ -1,0 +1,103 @@
+---
+title: buildProposeAction
+description: The canonical "build a Pinace action PTB" example — propose, prove, take, swap, return, settle.
+---
+
+The hot-potato `Request` is created by `propose_action`, then has to
+travel through every policy `prove` call, the venue call, and
+finally `settle` — all in one PTB. `@pinace/core` ships builders for
+each step so you don't have to write Move call signatures by hand.
+
+```ts
+import { Transaction } from '@mysten/sui/transactions';
+import {
+  ActionKind,
+  buildProposeAction,
+  buildSettleAction,
+  PACKAGE_IDS,
+} from '@pinace/core';
+import { buildPolicyProves, spendingLimit } from '@pinace/core/policies';
+
+const tx = new Transaction();
+
+// 1. propose
+const request = buildProposeAction({
+  tx,
+  packageId: PACKAGE_IDS.testnet,
+  poolId,
+  kind: ActionKind.Swap,
+  coinInType: '0x2::sui::SUI',
+  coinOutType: USDC_TYPE,
+  amountIn: 100_000_000n,            // 0.1 SUI in MIST
+  minAmountOut: 98_000_000n,
+  deadlineMs: BigInt(Date.now() + 5 * 60_000),
+});
+
+// 2. prove every attached policy. spendingLimit() returns a builder
+//    that calls spending_limit_policy::prove with the right witness.
+buildPolicyProves({
+  tx,
+  packageId: PACKAGE_IDS.testnet,
+  poolId,
+  request,
+  policies: [spendingLimit()],
+});
+
+// 3. take the input coin out of the pool
+const coinIn = tx.moveCall({
+  target: `${PACKAGE_IDS.testnet}::balance_pool::take_coin`,
+  typeArguments: ['0x2::sui::SUI'],
+  arguments: [tx.object(poolId), request],
+});
+
+// 4. do the actual venue call (DeepBook v3 here)
+const coinOut = /* deepbook v3 swap_exact_base call returning Coin<USDC> */;
+
+// 5. return the output coin to the pool
+tx.moveCall({
+  target: `${PACKAGE_IDS.testnet}::balance_pool::return_coin`,
+  typeArguments: [USDC_TYPE],
+  arguments: [tx.object(poolId), request, coinOut],
+});
+
+// 6. settle — consumes the request, verifies every policy proved + types match
+buildSettleAction({
+  tx,
+  packageId: PACKAGE_IDS.testnet,
+  poolId,
+  request,
+});
+
+// 7. sign + execute with the AGENT key (Pinace Wallet does this for you
+//    via pinace:signAndExecuteAsAgent; here's the bare-metal version)
+const result = await client.signAndExecuteTransaction({
+  transaction: tx,
+  signer: agentKeypair,
+  include: { effects: true },
+});
+```
+
+## What each builder does
+
+| Builder | Move target | Notes |
+| --- | --- | --- |
+| `buildProposeAction` | `balance_pool::propose_action` | Returns the hot-potato `Request`. Drops it = whole tx aborts. |
+| `buildPolicyProves` | each policy's `prove` | Walks the array, adds one move call per policy. Order matches the policy's witness type. |
+| `buildSettleAction` | `balance_pool::settle` | Must come **after** every prove + every coin take/return. Final consume of the request. |
+
+## Wallet-mode shortcut
+
+If you're inside a browser dApp and want Pinace Wallet to handle
+signing, build the unsigned tx with `agentAddress` (the wallet
+returned it from `connectAgent`) and hand the bytes to
+`pinace:signAndExecuteAsAgent`:
+
+```ts
+tx.setSenderIfNotSet(agentAddress);
+const bytes = await tx.toJSON();
+const { digest } = await wallet.features['pinace:signAndExecuteAsAgent']
+  .signAndExecute({ transaction: tx });
+```
+
+The wallet pops the Sign approval, the user confirms, the wallet
+broadcasts. Your agent never sees the secret.

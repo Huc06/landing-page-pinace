@@ -1,0 +1,68 @@
+---
+title: Hot-potato PTB
+description: Why every Pinace action is one atomic transaction — and what happens when something inside it goes wrong.
+---
+
+Sui Move has a "hot-potato" pattern: a struct with no `key`, no
+`store`, no `drop` — once it exists, it **must** be consumed in the
+same transaction or the PTB fails. Pinace uses this for `Request`.
+
+```move
+struct Request { /* no abilities */ }
+```
+
+Every action runs as one PTB:
+
+```text
+propose_action(pool, agent, kind, amount_in, min_out, deadline) → Request
+spending_limit_policy::prove(pool, &mut request, clock)
+slippage_policy::prove(...)              // any number of policies
+balance_pool::take_coin<T>(pool, &mut request) → Coin<T>
+deepbook::pool::swap_exact_base(...)     // the actual venue call
+balance_pool::return_coin<U>(pool, &mut request, coin_out)
+balance_pool::settle(pool, request, ...)
+```
+
+`settle` is the **only** function that consumes the `Request`. Before
+it accepts the request, it checks:
+
+1. Every attached policy has added its receipt.
+2. The coin types in `take_coin` / `return_coin` match the kind.
+3. `min_amount_out` was met by the venue.
+
+If any of those fail, the PTB aborts → **the whole transaction
+reverts**. Funds never move; the policy counter never advances; the
+event log doesn't fire. There is no intermediate state to clean up.
+
+## What this buys you
+
+- **Atomicity.** You can't see a half-finished swap on chain.
+- **Composability.** Any number of policies stack — they're just
+  more `prove` calls before `settle`.
+- **Auditability.** One digest covers the whole intent → settlement
+  flow; explorers show it as a single transaction.
+- **No middleman.** No off-chain coordinator deciding whether the
+  swap "really" happened. Either it's on chain or it isn't.
+
+## Comparison with EVM allowances
+
+| | EVM `approve` | Pinace policy + PTB |
+| --- | --- | --- |
+| Granularity | Token amount cap, one token at a time | Per-action + per-window cap across coins |
+| Enforcement | At venue contract (each integrates differently) | At Pinace, before any venue call |
+| Revoke speed | One tx per token | One tx burns ALL agent authority |
+| Failure mode | Venue tx reverts; allowance still spent | Whole PTB reverts; nothing moves |
+
+## Reading the receipt list
+
+The wallet's [Audit timeline](/docs/indexer) shows every action by
+its lifecycle:
+
+- `proposed` — `propose_action` event fired, but `settle` hasn't
+  run yet.
+- `settled` — full PTB landed; coins moved.
+- `reverted` — PTB aborted; no state change. (Indexer infers from
+  Sui tx status.)
+
+A reverted action still costs gas (paid by the agent's address), but
+nothing else.

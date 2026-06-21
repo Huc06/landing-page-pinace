@@ -1,0 +1,66 @@
+---
+title: Indexer
+description: Fastify + Postgres + SSE service that denormalises Pinace's on-chain state into a queryable, real-time read API.
+---
+
+The chain is the source of truth, but reading raw events on every
+page load is slow and complicated. The Pinace Indexer follows a
+Sui Move checkpoint loop, decodes the events it cares about, and
+upserts into a Postgres schema you can query with one HTTP call.
+
+```text
+Sui fullnode (events)
+        │
+        ▼  poll checkpoints by package id
+┌─────────────────┐
+│ Indexer worker  │ ── parse + map ──▶  Postgres
+└─────────────────┘                       │
+        │                                 │
+        └─ ssePublisher.publish() ────────┘
+                       │
+                       ▼
+              SSE subscribers (wallet, Fenik)
+```
+
+## What it knows about
+
+| Resource | Source events | Endpoint |
+| --- | --- | --- |
+| Pool | `PoolCreatedEvent`, `DepositEvent`, `WithdrawEvent`, `FlowAuthorizedEvent`, `FlowCompletedEvent` | `/pools/:id` |
+| Agent | `AgentConnectedEvent`, `AgentRevokedEvent` | `/agents`, `/agents/:id` |
+| Policy | `PolicyAttachedEvent`, `PolicyUpdatedEvent`, `PolicyDetachedEvent` | inside `/agents/:id` |
+| Action | `ActionProposedEvent`, `ActionSettledEvent`, `FlowAuthorized/Completed` | `/actions` |
+| Owner | aggregate over the above | `/owners/:address` |
+
+## Where it lives
+
+- Production: `https://fenik.one` (path-routed: `/pools`, `/agents`,
+  `/stream`, etc.).
+- Backed by the [`pinace-wallet/backend`](https://github.com/pinace-wallet/backend)
+  repo on AWS EC2 + RDS Postgres.
+- TLS via Let's Encrypt (Cloudflare not in the path).
+
+## Why denormalise?
+
+Two reasons:
+
+- **Cheap reads.** Wallet UI shows "spent so far 1.7 / 2 SUI" on
+  every Agent Detail page open. Computing that from raw events
+  per-request would scale poorly; the indexer maintains a running
+  `spent_in_window` per agent's spending-limit policy.
+- **Streaming.** The wallet + Fenik both subscribe via SSE for live
+  updates (every successful swap invalidates `['pool', id]` query
+  cache). The indexer is the single fan-out point.
+
+## Caveats
+
+- **Not a settlement authority.** The on-chain Move state is always
+  the source of truth. Treat indexer numbers as eventually
+  consistent — usually 1–2s lag.
+- **Eventual `spent_in_window`.** Right after a swap lands on chain,
+  but before the indexer processes `FlowAuthorizedEvent` (~1–2s),
+  the wallet's pre-check can wave through a swap that on-chain
+  `prove()` then aborts. The on-chain assert is the backstop.
+- **No retry queue.** If the indexer misses a checkpoint range
+  (e.g. fullnode hiccup), we restart from the last known cursor.
+  Already-processed events are upserted, no duplicates.

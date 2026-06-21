@@ -1,0 +1,70 @@
+---
+title: Agent key
+description: Each agent app gets its own Ed25519 keypair derived from the owner + origin + platform. Deterministic, scoped, revocable.
+---
+
+When the owner taps **Allow & connect** in the wallet's approval
+popup, Pinace **derives** an Ed25519 keypair for that agent:
+
+```ts
+const seed = sha256(ownerAddress || origin || platformId);
+const keypair = Ed25519Keypair.fromSeed(seed);
+```
+
+Three guarantees fall out of this:
+
+- **Deterministic.** Same `(owner, origin, platform)` → same agent
+  address. Reinstalling the extension or clearing local storage and
+  reconnecting gives you the same agent.
+- **Per-origin scope.** Two different sites get two different agent
+  addresses, even when the owner is the same. Compromising one site
+  doesn't leak the other's policy budget.
+- **Revocable.** The owner can burn the agent's authority with one
+  on-chain tx — even though the agent still holds the key, its next
+  `propose_action` reverts with `E_REVOKED` (see
+  [Revocation](/docs/concepts/revocation)).
+
+## What the agent key signs
+
+Only what the wallet hands it:
+
+```text
+sign_and_execute(
+  Transaction.from(unsigned_ptb_bytes_from_agent_app)
+)
+```
+
+The wallet inspects the PTB before signing — the approval popup
+shows the action kind, signer, payload preview. If you click
+**Stop** during execution, the wallet aborts the SDK promise (the
+on-chain tx may still land, but Fenik gets `User aborted execution`).
+
+## Funding the agent address
+
+The agent needs SUI for gas. Pinace funds it automatically on the
+first `connectAgent` (small dust amount). If you run a lot of swaps
+and the gas drains, top it up from the owner wallet — or use the
+`scripts/topup-agent.mts` script in the Fenik repo.
+
+DeepBook trades also need a small DEEP fee. The wallet currently
+expects DEEP in the pool; integrations like Cetus / Aftermath have
+their own fee models documented per-venue.
+
+## "I want to bring my own agent key"
+
+Some agent platforms generate keys server-side and ship the pubkey
+to the wallet. `pinace:connectAgent` accepts an optional
+`agentPubkey`:
+
+```ts
+await wallet.features['pinace:connectAgent'].connect({
+  platform: 'my-mcp-server',
+  agentPubkey: '0xpub...',  // optional — wallet WON'T store a secret
+});
+```
+
+When you supply a pubkey, the wallet stores `agentSecretKey: null`
+in the binding. `pinace:signAndExecuteAsAgent` then refuses — your
+platform has to sign txs itself and just hand the wallet a signed
+PTB to broadcast. Useful for MCP servers that already hold a key
+and don't want the wallet to derive one.

@@ -1,0 +1,24 @@
+---
+title: Scallop
+description: Money-market lending on Sui. Next-up venue — supply / repay loops bounded by Pinace policies.
+---
+
+<Callout type="warn">**Status: planned.** Money-market lending integration on the next-wave list.</Callout>
+
+## What an agent will do on Scallop
+
+- **Supply** a coin into the market (`scallop::market::deposit_collateral`).
+- **Borrow** within a borrow cap (custom policy enforcing
+  collateralisation ratio).
+- **Repay** + withdraw on a rebalance signal.
+
+## Policies that apply
+
+- `spending_limit_policy` — required.
+- `borrow_cap_policy` (custom, in design) — caps health factor, max
+  notional borrow, etc.
+
+## Links
+
+- [Scallop docs](https://docs.scallop.io)
+- [Scallop SDK](https://www.npmjs.com/package/@scallop-io/sui-scallop-sdk)

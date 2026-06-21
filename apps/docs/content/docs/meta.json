@@ -1,0 +1,12 @@
+{
+  "title": "Documentation",
+  "pages": [
+    "index",
+    "quickstart",
+    "concepts",
+    "sdk",
+    "wallet",
+    "indexer",
+    "integrations"
+  ]
+}

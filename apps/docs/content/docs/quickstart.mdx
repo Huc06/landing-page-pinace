@@ -1,0 +1,116 @@
+---
+title: Quickstart
+description: From zero to your first agent swap on Sui testnet in 5 minutes.
+---
+
+You'll install the Pinace Wallet extension, fund a BalancePool, attach
+a spending-limit policy, connect a sample agent, and watch it
+broadcast a DeepBook swap on chain — all under five minutes.
+
+<Callout type="info">
+  **Prereqs**: any Chromium-based browser (Chrome / Brave / Edge),
+  some testnet SUI (use the [Sui faucet](https://faucet.sui.io/)).
+</Callout>
+
+## 1. Install Pinace Wallet
+
+The wallet isn't on the Chrome Web Store yet. Until it ships, load
+the unpacked build:
+
+1. Grab the latest zip from the
+   [GitHub releases](https://github.com/pinace-wallet/frontend/releases)
+   (or build it yourself: `pnpm install && pnpm build`).
+2. Open `chrome://extensions`, enable **Developer mode**.
+3. **Load unpacked** → pick the `.output/chrome-mv3` folder.
+4. Pin Pinace Wallet from the puzzle-piece menu.
+
+Create a wallet (set a password). Pinace generates an Ed25519 owner
+key, password-encrypts it locally. The key never leaves your machine.
+
+## 2. Fund a BalancePool
+
+The pool is the only thing the agent can touch — your main wallet
+balance is invisible to it.
+
+1. Open Pinace Wallet → **Home** → **Add balance**.
+2. Approve the deposit (e.g. `0.5 SUI`). One signed tx.
+3. The pool object is created and the balance lands in seconds.
+
+You can deposit more later, or withdraw whenever you want.
+
+## 3. Attach a spending-limit policy
+
+Without a policy, the agent has nothing to prove against and
+`propose_action` reverts.
+
+1. **Agents** tab → tap your agent (or any from the list).
+2. **Add spending limit** → enter caps. Example:
+   - Per transaction: `0.1 SUI`
+   - Per 1 hour window: `1 SUI`
+3. **Review & sign** → approval popup → **Sign & attach**.
+
+The policy object is now attached to your pool, scoped to that
+agent's address.
+
+## 4. Connect a sample agent — Fenik
+
+[Fenik](https://fenik.one) is Pinace's reference chat agent. It runs
+in your browser, talks to OpenAI, and routes swaps through the
+wallet via Wallet Standard.
+
+1. Visit [https://fenik.one](https://fenik.one).
+2. **Connect Wallet** → pick **Pinace Wallet** from the modal.
+3. Pinace pops an **Approve** dialog: *Allow this site to act as an
+   agent?* — tap **Allow & connect**.
+4. The wallet derives a deterministic agent address for this origin,
+   funds it with a little gas, and attaches the agent on chain.
+
+## 5. Ask Fenik to swap
+
+In the chat box, try:
+
+> *Swap 0.05 WSUI to WUSDC.*
+
+Fenik will:
+- pull a live quote from DeepBook,
+- pre-flight your spending-limit policy,
+- build a hot-potato PTB (`propose_action → policy.prove →
+  take_coin → deepbook::swap → return_coin → settle`),
+- ask Pinace Wallet to sign as your agent.
+
+When the signature popup appears it shows the action, signer, and a
+running progress card while the tx broadcasts. Approve → watch the
+transaction digest appear in chat. Click it to verify on
+[Suiscan](https://suiscan.xyz/testnet).
+
+## What just happened
+
+```mermaid
+sequenceDiagram
+  participant U as You (owner)
+  participant W as Pinace Wallet
+  participant F as Fenik (agent app)
+  participant C as Sui chain
+  U->>W: Deposit + attach policy
+  U->>F: "Swap 0.05 WSUI → WUSDC"
+  F->>W: pinace:signAndExecuteAsAgent (built PTB)
+  W->>U: Approve popup
+  U->>W: Sign
+  W->>C: PTB: propose_action → prove → swap → settle
+  C-->>W: Digest
+  W-->>F: { digest }
+  F-->>U: "Swap done — view on Suiscan"
+```
+
+Your owner key signed exactly **two** transactions in this whole
+flow (deposit + attach policy). Every swap from here on is signed by
+the agent key — and that agent key can only ever spend what your
+policy allows.
+
+## Next
+
+- [Concepts](/docs/concepts) — the BalancePool, policies, hot-potato
+  PTB and what each guarantees.
+- [SDK](/docs/sdk) — `@pinace/core` exports if you're building your
+  own agent / MCP server.
+- [Integrations](/docs/integrations) — what venues are live + planned.

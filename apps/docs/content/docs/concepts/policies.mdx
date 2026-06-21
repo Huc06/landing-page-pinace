@@ -1,0 +1,112 @@
+---
+title: Policies
+description: On-chain rules that constrain what an agent can do. Move enforces them inside the same PTB as the swap — break a rule and the whole tx reverts.
+---
+
+A **policy** is a Move object the owner attaches to a pool. It
+exposes one `prove(...)` entry that the agent must call inside its
+action PTB; if `prove` aborts, the whole transaction reverts and
+nothing moves.
+
+```move
+public fun prove(pool: &mut BalancePool, request: &mut Request, clock: &Clock) {
+    // ... check + add receipt
+}
+```
+
+Pinace ships a few policies today and an SDK pattern that lets
+anyone add their own.
+
+## Built-in policies
+
+### `spending_limit_policy`
+
+The most common policy. Caps how much an agent can spend per
+transaction and per rolling time window.
+
+```text
+max_per_tx       u64   // atomic units of the input coin
+max_per_window   u64   // total across the window
+window_ms        u64   // sliding window length
+spent_in_window  u64   // counter, advanced by every successful prove
+window_started_ms u64
+```
+
+| Abort | Code | Meaning |
+| --- | --- | --- |
+| `EMaxPerTxExceeded` | 101 | One swap is bigger than `max_per_tx` |
+| `EMaxPerWindowExceeded` | 102 | This swap would push spend past `max_per_window` |
+| `EWindowOverflow` | 103 | Clock moved backward (sanity check) |
+
+<Callout type="warn">
+  **Atomic units, not symbols.** Limits are raw `u64` — the contract
+  doesn't know "SUI". `1_000_000_000` caps 1 SUI **and** 1 WSUI
+  (both 9-dec), but maps to **1,000 DBUSDC** (6-dec). When the
+  wallet UI says "1 SUI" it means `1e9` of whatever input coin the
+  agent uses.
+</Callout>
+
+### `slippage_policy` (planned)
+
+Caps how far the executed price may deviate from the quoted price.
+Shipping with Cetus integration.
+
+### `token_whitelist_policy` (hidden in UI today)
+
+Restricts allowed input/output coin types. Already on-chain; UI
+exposure waits for the multi-venue release.
+
+### `time_window_policy` (planned)
+
+Active-from / active-until timestamps. Used for one-shot delegations.
+
+## Lifecycle
+
+```mermaid
+sequenceDiagram
+  participant U as Owner
+  participant W as Pinace Wallet
+  participant P as Pool (chain)
+  participant A as Agent
+  U->>W: Attach spending_limit { 0.1 SUI / tx, 1 SUI / 1h }
+  W->>P: PTB: balance_pool::attach_policy<Witness, Config>
+  P-->>U: Policy live, scoped to (agent, witness)
+  A->>P: propose_action (request)
+  A->>P: spending_limit_policy::prove(pool, request, clock)
+  P-->>A: receipt added to request
+  A->>P: ... take_coin → settle
+```
+
+The owner can attach, **update** (recompose config), or **detach**
+policies at any time. Every change is a signed owner tx.
+
+## Writing your own policy
+
+Implement the witness pattern:
+
+```move
+module my_org::cooldown_policy {
+    struct Witness has drop {}
+    struct Config has store { last_action_ms: u64, cooldown_ms: u64 }
+
+    public fun init_for_pool(pool: &mut BalancePool, agent: address, cooldown_ms: u64, ctx: &mut TxContext) {
+        balance_pool::attach_policy<Witness, Config>(
+            pool, agent, Witness {},
+            Config { last_action_ms: 0, cooldown_ms },
+            ctx,
+        );
+    }
+
+    public fun prove(pool: &mut BalancePool, request: &mut Request, clock: &Clock) {
+        let witness = Witness {};
+        let cfg = balance_pool::borrow_policy_config_mut<Witness, Config>(pool, request, &witness);
+        let now = clock::timestamp_ms(clock);
+        assert!(now - cfg.last_action_ms >= cfg.cooldown_ms, 1);
+        cfg.last_action_ms = now;
+        request::add_receipt(request, witness);
+    }
+}
+```
+
+Then call `prove` inside the agent's action PTB. The receipt
+satisfies `Request::all_policies_proven` before `settle` can run.

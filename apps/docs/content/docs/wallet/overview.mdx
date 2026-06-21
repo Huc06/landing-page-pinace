@@ -1,0 +1,44 @@
+---
+title: Pinace Wallet
+description: Chrome MV3 browser extension. Owner-controlled BalancePool, policy management, agent sign approvals — all in one popup.
+---
+
+The Pinace Wallet is the owner's home base. It does five things:
+
+1. Holds the owner's password-encrypted Ed25519 key locally.
+2. Creates and funds a `BalancePool` on Sui testnet.
+3. Manages policies attached to that pool (add, update, remove).
+4. Implements the Sui [Wallet Standard](https://docs.sui.io/standards/wallet-standard)
+   `sui:signTransaction` + Pinace's custom features so dApps can
+   drive an agent.
+5. Pops the **Sign approval** window for every state-mutating action
+   — deposit, withdraw, policy change, revoke agent, and every
+   agent-driven swap.
+
+## Where it runs
+
+- **Browser**: Chrome / Brave / Edge MV3 (load unpacked today; Web
+  Store listing in review). Firefox MV3 support tracked.
+- **Native**: not yet. Mobile is on the roadmap; the wallet
+  semantics map cleanly to React Native.
+
+## Storage
+
+- Encrypted secret (AES-GCM, password-derived) in `chrome.storage.local`.
+- One agent binding per origin + platform (so `fenik.one` and
+  `dexagent.example` get separate agent addresses).
+- No telemetry, no analytics, no remote config.
+
+## How dApps interact
+
+Two channels:
+
+| Channel | Used for |
+| --- | --- |
+| Sui Wallet Standard (`sui:signTransaction`, `sui:signAndExecuteTransaction`) | Owner-signed txs (deposits, withdrawals, owner-initiated swaps). Same shape as Slush, Sui Wallet, etc. |
+| Pinace custom features (`pinace:connectAgent`, `pinace:signAndExecuteAsAgent`) | Agent-driven flows. See [Wallet Standard features](/docs/wallet/wallet-standard-features). |
+
+## Source
+
+Repo: [`pinace-wallet/frontend`](https://github.com/pinace-wallet/frontend).
+Built with WXT + React 19 + dapp-kit + Tailwind. PRs welcome.

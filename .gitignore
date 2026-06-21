@@ -1,0 +1,12 @@
+node_modules/
+.next/
+.output/
+.vercel/
+.turbo/
+*.tsbuildinfo
+.DS_Store
+.env*.local
+
+# fumadocs generated
+apps/docs/.source/
+apps/docs/source/

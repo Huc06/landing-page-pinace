@@ -1,0 +1,82 @@
+---
+title: BalancePool
+description: The on-chain escrow that holds the funds agents can act on. The owner funds it; the agent spends through it; the protocol books-keep every coin.
+---
+
+A **BalancePool** is a shared on-chain object owned by you. It holds
+coins as escrow and exposes one entry per coin type. Agents read and
+write through `take_coin` / `return_coin` calls that always sit
+inside a policy-checked PTB.
+
+```move
+struct BalancePool has key {
+  id: UID,
+  owner: address,
+  balances: Bag,              // coin_type → Balance<T>
+  policy_configs: Bag,        // (agent, policy_witness) → config
+  ...
+}
+```
+
+## Why a pool, not your wallet?
+
+Your main wallet might hold meme coins, NFTs, the rent. None of that
+should be reachable by an agent.
+
+The pool is a **blast-radius cap**: even if the agent's key is
+stolen, the worst case is the pool gets drained — within whatever
+spending limit you set. Your wallet stays untouched.
+
+## Lifecycle
+
+1. **Create** — `balance_pool::create_for_owner` returns a pool with
+   the owner address recorded.
+2. **Deposit** — `balance_pool::deposit<T>` adds coins of type `T` to
+   the appropriate sub-balance.
+3. **Authorize agent** — owner attaches `Policy<C>` configs scoped to
+   a specific agent address.
+4. **Agent spends** — agent calls `propose_action(...)`, runs policy
+   proves, then `take_coin → settle`.
+5. **Withdraw** — only the owner can `balance_pool::withdraw<T>` —
+   single signed transaction.
+
+## One pool, many agents
+
+A pool can host **multiple agents simultaneously**. Each agent gets
+its own scoped policy config in `policy_configs`:
+
+```text
+pool_0xabc
+├── agent_0x111 → spending_limit{ max_per_tx: 1 SUI, max_per_window: 5 SUI }
+├── agent_0x222 → spending_limit{ max_per_tx: 0.1 SUI, max_per_window: 1 SUI }
+└── agent_0x333 → slippage_guard{ max_bps: 50 }
+```
+
+Agents share the same coin balances. If `agent_0x111` swaps 1 SUI →
+USDC, the pool's USDC sub-balance grows; `agent_0x222` can then
+spend it (subject to its own policy).
+
+This is why the wallet shows **Pool budget** (the pool's total) on
+the Agent detail page — every agent on a pool draws from the same
+pile.
+
+## Inspecting a pool
+
+Via [`@pinace/core`](/docs/sdk):
+
+```ts
+import { getPool } from '@pinace/core';
+
+const pool = await getPool(poolId);
+// {
+//   poolId, owner,
+//   balances: [{ coinType, amount }, ...],
+//   policies: [{ agentAddress, policyType, config }, ...],
+// }
+```
+
+Via the [Indexer](/docs/indexer):
+
+```sh
+curl https://fenik.one/pools/0xabc...
+```

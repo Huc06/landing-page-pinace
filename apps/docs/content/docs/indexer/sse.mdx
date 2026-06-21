@@ -1,0 +1,81 @@
+---
+title: Server-Sent Events
+description: Subscribe to live agent / pool updates without polling. One connection, JSON events.
+---
+
+```sh
+curl -N 'https://fenik.one/stream?owner=0xf167...&poolId=0xabc'
+```
+
+Endpoint: `GET /stream`. Returns `text/event-stream`. Filterable by
+`owner`, `poolId`, `agentAddress`. Heartbeat every 15s so reverse
+proxies don't time the connection out.
+
+## Event shape
+
+Each event is a JSON object on a single line:
+
+```json
+{ "kind": "pool_deposit", "poolId": "0xabc", "coinType": "0x2::sui::SUI", "amount": "500000000", "txDigest": "..." }
+{ "kind": "pool_withdraw", ... }
+{ "kind": "agent_connected", "agentAddress": "0x...", "poolId": "..." }
+{ "kind": "agent_revoked", ... }
+{ "kind": "action_proposed", "agentAddress": "...", "kind": "swap", "amountIn": "100000000", ... }
+{ "kind": "action_settled", ... }
+```
+
+Mapped from these on-chain events (one fan-out per event):
+
+| On-chain event | SSE kind |
+| --- | --- |
+| `DepositEvent` | `pool_deposit` |
+| `WithdrawEvent` | `pool_withdraw` |
+| `FlowAuthorizedEvent` | `pool_withdraw` (input coin) |
+| `FlowCompletedEvent` | `pool_deposit` (output coin) |
+| `AgentConnectedEvent` | `agent_connected` |
+| `AgentRevokedEvent` | `agent_revoked` |
+| `ActionProposedEvent` | `action_proposed` |
+| `ActionSettledEvent` | `action_settled` |
+
+## Browser usage
+
+```ts
+const es = new EventSource(
+  `https://fenik.one/stream?owner=${owner}&poolId=${poolId}`,
+);
+
+es.onmessage = (ev) => {
+  const evt = JSON.parse(ev.data);
+  if (evt.kind === 'pool_deposit' || evt.kind === 'pool_withdraw') {
+    // refetch the pool snapshot
+    qc.invalidateQueries({ queryKey: ['pool', evt.poolId] });
+  }
+};
+
+es.onerror = () => {
+  // browser auto-reconnects every 3s by default; you usually don't need this
+};
+
+// when the React component unmounts
+return () => es.close();
+```
+
+The wallet + Fenik both use this pattern via the `useIndexerStream`
+hook — it invalidates the right TanStack Query keys so balances /
+agents update without polling.
+
+## Nginx + SSE
+
+If you self-host: SSE needs `proxy_buffering off` + HTTP/1.1 +
+`proxy_read_timeout` long enough to outlast the heartbeat (we use
+`86400s`). Pinace's nginx config:
+
+```nginx
+proxy_http_version 1.1;
+proxy_set_header Connection "";
+proxy_buffering off;
+proxy_read_timeout 86400s;
+```
+
+Without those, the proxy buffers events for ~30s before flushing
+them, which defeats the realtime point.

@@ -1,0 +1,71 @@
+---
+title: Revocation
+description: One signed tx burns an agent's on-chain authority. Its next propose_action reverts with E_REVOKED.
+---
+
+Revocation is the single biggest difference between Pinace and the
+EVM `approve` pattern. There's no per-token sweep, no "spend it
+before they revoke" race — one tx ends the agent's authority for
+all coins, forever.
+
+## What happens on chain
+
+```move
+public entry fun revoke_agent(pool: &mut BalancePool, agent: address, ctx: &mut TxContext) {
+    assert!(tx_context::sender(ctx) == pool.owner, E_NOT_OWNER);
+    // Remove the agent's delegation record + every policy config scoped to it.
+    delegation::burn(pool, agent);
+    bag::remove_all_with_prefix(&mut pool.policy_configs, agent);
+    event::emit(AgentRevokedEvent { pool: object::id(pool), agent });
+}
+```
+
+After that:
+
+- Any `propose_action` from that agent address reverts with
+  `E_REVOKED`.
+- Any policy config previously attached to that agent is gone — even
+  if the agent reconnects later, it starts from zero.
+- The pool, the policies of other agents, and the owner balance are
+  untouched.
+
+## What happens client-side
+
+The Pinace Wallet's Agent Detail page exposes the **kill switch**:
+flip the "Agent enabled" toggle → confirm dialog → type the short
+address → **Sign & revoke**.
+
+Two notes on UX:
+
+- **Two-step confirmation.** The toggle opens a destructive HeroUI-
+  style modal; you type the agent's short address to unlock the red
+  button. We make it slightly annoying on purpose.
+- **Can't be un-revoked.** Move's `revoke_agent` is permanent. To
+  re-enable, the agent platform must run `connectAgent` again — the
+  deterministic key derivation gives back the same address, but the
+  wallet treats it as a fresh binding (new policies have to be
+  attached).
+
+## Revoking from the indexer
+
+```sh
+# Find every agent attached to a pool
+curl https://fenik.one/agents?poolId=0xabc&status=active
+```
+
+Returns one row per active agent. Hit the wallet's revoke flow for
+each, or call `revoke_agent` directly via `@pinace/core` if you're
+scripting.
+
+## Edge case: in-flight tx
+
+The wallet's Stop button in the execution-progress popup races the
+on-chain tx against an abort signal. If you hit Stop after the PTB
+has already broadcast, the wallet returns
+`Error: User aborted execution` to the agent app — but the on-chain
+tx may still land. Always check the agent address on Suiscan after a
+hard abort if you want to be 100% sure.
+
+Revoking the agent **doesn't** cancel an already-submitted tx.
+Either it lands (in which case the policy was satisfied at submit
+time, so it stays inside your budget) or it reverts.

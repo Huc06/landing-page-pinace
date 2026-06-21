@@ -1,0 +1,52 @@
+---
+title: SDK overview
+description: '@pinace/core ships everything you need to compose a Pinace PTB on @mysten/sui — builders, types, package IDs, and a read client.'
+---
+
+[`@pinace/core`](https://www.npmjs.com/package/@pinace/core) is the
+TypeScript surface Pinace itself uses. Pure utility — no React, no
+side effects.
+
+```sh
+npm install @pinace/core @mysten/sui
+```
+
+Three things you'll touch:
+
+| Module | What it gives you |
+| --- | --- |
+| `ptb/*` | Functions that take a `Transaction` and add a Pinace move call (propose, prove, settle, attach policy, deposit, withdraw, revoke). |
+| `policies/*` | Helpers to compose policy configs (spending limit, slippage, etc.) and bind them to `attach_policy<W, C>`. |
+| `read/*` | A small read client (over `@mysten/sui/grpc`) for the data the indexer doesn't yet host — mostly object state. |
+
+## What's NOT in the SDK
+
+- **No signer.** You bring your own `Ed25519Keypair` (or the agent's
+  derived key, or whatever wallet you're driving).
+- **No indexer client.** Pinace's indexer is just HTTP + SSE; use
+  `fetch`. We don't ship a typed client to avoid coupling SDK
+  releases to indexer schema churn.
+- **No UI.** That lives in the wallet extension repo.
+
+## Versions
+
+| Channel | Status | Notes |
+| --- | --- | --- |
+| `@pinace/core@0.5.x` | live | Current. Includes `return_coin`, the v2 action shape, and PACKAGE_IDS for the Move package live on testnet. |
+| `@pinace/core@0.4.x` | superseded | Pre-`return_coin`. Don't use for new builds. |
+| `@pinace/agent-sdk` | coming soon | LangChain / AutoGen adapters + an MCP server scaffold. |
+
+<Callout type="info">
+  **Track the latest PACKAGE_ID.** Pinace re-publishes the Move
+  package on every breaking change. Always read `PACKAGE_IDS[network]`
+  from the SDK rather than hard-coding — that constant updates with
+  every npm release.
+</Callout>
+
+## Next
+
+- [Installation](/docs/sdk/installation) — install + bring a signer.
+- [PACKAGE_IDS](/docs/sdk/package-ids) — what each network maps to today.
+- [`buildProposeAction`](/docs/sdk/build-propose-action) — the
+  canonical "build an action PTB" example.
+- [Policies](/docs/sdk/policies) — compose configs and attach them.

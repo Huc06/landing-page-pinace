@@ -1,0 +1,122 @@
+---
+title: Wallet Standard features
+description: pinace:connectAgent + pinace:signAndExecuteAsAgent — the two custom features any wallet-standard dApp needs.
+---
+
+Pinace Wallet announces two custom features via the Sui Wallet
+Standard. dapp-kit picks them up automatically — read them off the
+wallet's `features` object.
+
+```ts
+import { useWallets } from '@mysten/dapp-kit';
+
+const pinaceWallet = useWallets().find((w) => w.name === 'Pinace Wallet');
+const features = pinaceWallet?.features as PinaceWalletFeatures;
+```
+
+## `pinace:connectAgent`
+
+Register your origin as an agent platform and bind an agent address
+to it. Idempotent per `(origin, platform)` — the wallet returns the
+existing binding silently on reconnect, but pops an approval popup
+the first time a session calls this.
+
+```ts
+const { agentAddress, poolId, reused } =
+  await features['pinace:connectAgent'].connect({
+    platform: 'fenik',            // your platform's stable ID
+    agentPubkey?: string,         // optional — bring your own key
+  });
+```
+
+| Result field | Meaning |
+| --- | --- |
+| `agentAddress` | The deterministic address the wallet will sign as. |
+| `poolId` | The active pool the agent is bound to (one per owner). |
+| `reused` | `true` if the binding already existed for this origin + platform. |
+
+If `agentPubkey` is omitted, the wallet derives the agent keypair
+from `sha256(owner || origin || platform)` and stores the secret
+locally. With a pubkey supplied, the wallet stores `agentSecretKey:
+null` and refuses `signAndExecuteAsAgent` — your platform signs.
+
+## `pinace:signAndExecuteAsAgent`
+
+Hand the wallet an unsigned `Transaction`; the wallet signs with the
+agent keypair, broadcasts, waits for finality, returns the digest.
+
+```ts
+const { digest } = await features['pinace:signAndExecuteAsAgent']
+  .signAndExecute({ transaction });
+```
+
+This is what fires the **Sign approval** popup with the live
+[execution progress](/docs/wallet/approval-popup) view. The user can
+hit Stop mid-flight — the wallet races the on-chain pipeline against
+the abort signal and throws `Error: User aborted execution` to your
+app if they do.
+
+Refuses if:
+- No binding exists for the calling origin → caller should run
+  `connectAgent` first.
+- The binding has no stored secret (you brought your own pubkey) →
+  caller signs themselves and uses `sui:signAndExecuteTransaction`
+  instead.
+
+## End-to-end snippet
+
+```ts
+import { Transaction } from '@mysten/sui/transactions';
+import { useWallets } from '@mysten/dapp-kit';
+import {
+  ActionKind,
+  buildProposeAction,
+  buildSettleAction,
+  PACKAGE_IDS,
+} from '@pinace/core';
+
+const wallet = useWallets().find((w) => w.name === 'Pinace Wallet')!;
+const features = wallet.features as PinaceWalletFeatures;
+
+// 1. one-time per origin
+const { agentAddress, poolId } = await features['pinace:connectAgent'].connect({
+  platform: 'my-agent',
+});
+
+// 2. each swap: build PTB, ask wallet to sign as the agent
+const tx = new Transaction();
+tx.setSenderIfNotSet(agentAddress);
+
+const request = buildProposeAction({
+  tx, packageId: PACKAGE_IDS.testnet, poolId,
+  kind: ActionKind.Swap,
+  /* ... */
+});
+// ... prove + take + venue + return + settle ...
+buildSettleAction({ tx, packageId: PACKAGE_IDS.testnet, poolId, request });
+
+const { digest } = await features['pinace:signAndExecuteAsAgent']
+  .signAndExecute({ transaction: tx });
+
+console.log(`Settled: https://suiscan.xyz/testnet/tx/${digest}`);
+```
+
+## Feature TypeScript types
+
+```ts
+export type PinaceWalletFeatures = {
+  'pinace:connectAgent'?: {
+    connect: (args: {
+      platform: string;
+      agentPubkey?: string;
+    }) => Promise<{ agentAddress: string; poolId: string; reused: boolean }>;
+  };
+  'pinace:signAndExecuteAsAgent'?: {
+    signAndExecute: (args: { transaction: Transaction }) => Promise<{ digest: string }>;
+  };
+};
+```
+
+Check with `?.` — other wallets don't expose these features, so your
+app needs a graceful fallback (e.g. "Install Pinace Wallet to use
+the agent flow").

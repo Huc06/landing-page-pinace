@@ -1,0 +1,54 @@
+---
+title: Read client
+description: Small wrapper around @mysten/sui/grpc for the chain-state reads the indexer doesn't host.
+---
+
+The Pinace [Indexer](/docs/indexer) is your first stop for reading
+pool / agent / policy / action state — it's already denormalised,
+cached, and pushes SSE updates.
+
+`@pinace/core`'s read client is for the few things the indexer
+doesn't serve: object types, raw bag entries, gas-price probes, and
+balance lookups for an arbitrary address (not the pool).
+
+```ts
+import { getSuiClient, PinaceClient } from '@pinace/core';
+
+const sui = getSuiClient('testnet');
+const pinace = new PinaceClient({ sui, network: 'testnet' });
+
+// arbitrary address SUI balance
+const { balance } = await sui.getBalance({
+  owner: '0xagent...',
+  coinType: '0x2::sui::SUI',
+});
+console.log(balance.balance); // mist string
+
+// pool snapshot (type + balances + policy configs)
+const pool = await pinace.getPool(poolId);
+```
+
+`getSuiClient` returns a memoised `SuiGrpcClient` configured for
+the network's fullnode URL. Override the `baseUrl` if you're
+pointing at a private RPC:
+
+```ts
+import { SuiGrpcClient } from '@mysten/sui/grpc';
+
+const sui = new SuiGrpcClient({
+  network: 'testnet',
+  baseUrl: 'https://my-private-fullnode.example:443',
+});
+```
+
+## Why gRPC instead of jsonRpc?
+
+Sui's gRPC API is the supported surface going forward. It's also
+where `signAndExecuteTransaction` lives — using one client for reads
+and writes keeps types consistent.
+
+Gotcha (worth knowing): the gRPC `getBalance` response is
+`{ balance: { balance, coinType, coinBalance, addressBalance } }`,
+**not** the flat `{ totalBalance }` you'd see on `SuiJsonRpcClient`.
+Pinace Wallet hit this exact bug — see the wallet's
+`useAgentSuiBalance` hook for the right pattern.
