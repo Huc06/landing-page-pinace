@@ -38,9 +38,14 @@ export default function Nav() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // When the page is scrolled the nav pill flips to ~85% white
+  // bg — force the links to pure black so they read against it
+  // (text-foreground was too soft in light mode). Top state stays
+  // soft white since the pill is barely-visible glass over the
+  // dark hero.
   const linkColor = scrolled
-    ? "text-foreground/70 hover:text-foreground"
-    : "text-white/80 hover:text-white";
+    ? "text-black/85 hover:text-black"
+    : "text-white/85 hover:text-white";
 
   return (
     <header ref={headerRef} className="fixed inset-x-0 top-0 z-50">
