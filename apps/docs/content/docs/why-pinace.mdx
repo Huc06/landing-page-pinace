@@ -1,0 +1,90 @@
+---
+title: Why Pinace
+description: One page that compares Pinace to the alternatives and lists the 8 things you actually get when you build on it.
+---
+
+## Compared to the alternatives
+
+| | Hand over private key | EVM `approve` | Pinace |
+| --- | --- | --- | --- |
+| Agent can drain wallet | **yes** | only the approved token | **never** — escrow only |
+| Per-action cap | n/a | no | **yes** — Move enforces it |
+| Time-window cap | n/a | no | **yes** |
+| Revoke = one tx, all coins | n/a | one tx **per token** | **yes — one tx for all** |
+| Half-finished action possible | yes | yes | **no** — atomic PTB |
+| Custom rules (slippage, cooldown, ...) | manual | each venue reimplements | **plug-in Move policy** |
+
+## What you actually get
+
+### 1. Hot-potato settlement
+Every action is one PTB: `propose_action → policy.prove → take_coin →
+venue → return_coin → settle`. The `Request` hot-potato must be
+consumed in the **same** transaction — half-done states are
+mathematically impossible. [Read more →](/docs/concepts/hot-potato-ptb)
+
+### 2. On-chain policy guards
+`spending_limit` (per-tx + per-window), `slippage_guard`,
+`token_whitelist`, `time_window`. All run inline in the action
+PTB. Break a rule → whole tx reverts. [Read more →](/docs/concepts/policies)
+
+### 3. One-click revoke, all coins
+The owner signs one `revoke_agent` tx. The agent's next
+`propose_action` aborts with `E_REVOKED`. No per-token sweep, no
+"spend it before they revoke" race. [Read more →](/docs/concepts/revocation)
+
+### 4. One pool, many agents
+A single `BalancePool` hosts unlimited agents, each scoped to its
+own policy budget. Connect Fenik on Monday, a yield bot on Tuesday;
+they share the funds you escrowed once. [Read more →](/docs/concepts/balance-pool)
+
+### 5. Deterministic agent addresses
+The agent key is derived from `sha256(owner || origin || platform)`.
+Reinstall the wallet, clear local storage, switch laptops — the
+agent address for `fenik.one` stays the same. [Read more →](/docs/concepts/agent-key)
+
+### 6. Wallet-Standard plug-and-play
+Pinace exposes two custom Wallet-Standard features —
+`pinace:connectAgent` + `pinace:signAndExecuteAsAgent`. Any
+dapp-kit app drives a Pinace agent with two RPCs.
+[Read more →](/docs/wallet/wallet-standard-features)
+
+### 7. Realtime audit trail
+The indexer streams every `pool_deposit`, `pool_withdraw`,
+`action_proposed`, `action_settled` over SSE. Wallet UI and Fenik
+both subscribe and refresh without polling. [Read more →](/docs/indexer/sse)
+
+### 8. Stop mid-flight
+The approval popup turns into an execution-progress card with a
+red Stop button. Click it during executing → wallet returns
+`User aborted execution` to the agent. The Move PTB may still
+land — but the agent app gets the signal to stop chatting.
+[Read more →](/docs/wallet/approval-popup)
+
+## Non-custodial — for real
+
+The relayer / indexer / docs site can disappear tomorrow. Your
+funds don't.
+
+- The pool object is on Sui, owned by your address.
+- The owner key is encrypted by your password in `chrome.storage.local`.
+  Nobody else has it.
+- The agent key is derived locally or supplied by your platform.
+- Pinace runs no signers, no escrows, no off-chain settlement.
+
+If you stop trusting us, withdraw with one signed tx and uninstall.
+
+## Open source
+
+| | Repo |
+| --- | --- |
+| Wallet extension | [`pinace-wallet/frontend`](https://github.com/pinace-wallet/frontend) |
+| Indexer + REST/SSE | [`pinace-wallet/backend`](https://github.com/pinace-wallet/backend) |
+| Fenik (reference agent) | [`pinace-wallet/pinace-agent`](https://github.com/pinace-wallet/pinace-agent) |
+| `@pinace/core` SDK | [`pinace-wallet/contracts-sdk`](https://github.com/pinace-wallet/contracts-sdk) |
+| Docs site | [`Huc06/landing-page-pinace`](https://github.com/Huc06/landing-page-pinace) |
+
+## Next
+
+- [Quickstart](/docs/quickstart) — first agent swap in 5 minutes.
+- [Architecture](/docs/architecture) — the four layers + end-to-end flow.
+- [SDK reference](/docs/sdk) — build your own agent.
