@@ -5,6 +5,9 @@ builder = "DOCKERFILE"
 dockerfilePath = "apps/docs/Dockerfile"
 
 [deploy]
-startCommand = "pnpm exec next start -p $PORT"
+# startCommand omitted on purpose — Dockerfile CMD wraps next start
+# in `sh -c` so $PORT expands. Setting startCommand here would
+# override CMD and Railway doesn't shell-expand the value, so next
+# saw the literal "$PORT" and crashed.
 restartPolicyType = "ON_FAILURE"
 restartPolicyMaxRetries = 3
