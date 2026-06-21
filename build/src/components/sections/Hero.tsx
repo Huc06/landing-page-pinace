@@ -1,68 +1,28 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import { ArrowRight } from "lucide-react";
-import Hls from "hls.js";
 import { AddToChromeButton } from "@/components/common/AddToChromeButton";
-
-const videoSrc =
-  "https://stream.mux.com/T6oQJQ02cQ6N01TR6iHwZkKFkbepS34dkkIc9iukgy400g.m3u8";
-const posterSrc =
-  "https://images.unsplash.com/photo-1647356191320-d7a1f80ca777?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGRhcmslMjB0ZWNobm9sb2d5JTIwbmV1cmFsJTIwbmV0d29ya3xlbnwxfHx8fDE3Njg5NzIyNTV8MA&ixlib=rb-4.1.0&q=80&w=1080";
+import { BlueMeshBg } from "@/components/common/BlueMeshBg";
 
 export default function Hero() {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    if (Hls.isSupported()) {
-      const hls = new Hls();
-      hls.loadSource(videoSrc);
-      hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        video.play().catch((e) => console.log("Auto-play prevented:", e));
-      });
-      return () => {
-        hls.destroy();
-      };
-    } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
-      video.src = videoSrc;
-      video.addEventListener("loadedmetadata", () => {
-        video.play().catch((e) => console.log("Auto-play prevented:", e));
-      });
-    }
-  }, []);
-
   return (
     <section
       id="top"
       className="relative isolate w-full min-h-screen bg-black text-white overflow-hidden"
     >
-      {/* Background Video Layer */}
-      <div className="absolute inset-0 z-0">
-        <video
-          ref={videoRef}
-          muted
-          loop
-          playsInline
-          poster={posterSrc}
-          className="h-full w-full object-cover opacity-70"
-        />
-      </div>
-
-      {/* Video Overlay */}
-      <div className="absolute inset-0 z-[1] bg-black/40" />
-
-      {/* Decorative Gradients */}
+      {/* Interactive blue mesh background — replaces the prior Mux
+          video. Mouse-react gradient blobs (Awwwards "background
+          interaction" vibe), no third-party assets needed. */}
+      <BlueMeshBg />
+      {/* Soften the bottom so the headline reads cleanly + a vignette
+          for depth. */}
       <div
-        className="absolute z-[2] top-[-10%] left-[15%] w-[700px] h-[700px] rounded-full bg-blue-600/30 blur-[150px] pointer-events-none"
-        aria-hidden
-      />
-      <div
-        className="absolute z-[2] bottom-[-5%] right-[15%] w-[600px] h-[600px] rounded-full bg-indigo-500/25 blur-[130px] pointer-events-none"
+        className="absolute inset-0 z-[1] pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(120% 80% at 50% 30%, transparent 0%, rgba(0,0,0,0.35) 65%, rgba(0,0,0,0.6) 100%)",
+        }}
         aria-hidden
       />
 
