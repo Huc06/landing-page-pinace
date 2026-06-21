@@ -99,27 +99,37 @@ export const team = [
 
 export const sdkTiers = [
   {
-    pkg: "@pinace/wallet-sdk",
-    who: "End-user wallet apps (extension, mobile)",
+    pkg: "@pinace/core",
+    who: "PTB builders, on-chain types & read client",
+    status: "published" as const,
+    href: "https://www.npmjs.com/package/@pinace/core",
   },
   {
     pkg: "@pinace/agent-sdk",
     who: "Agent builders (LangChain, AutoGen, Eliza)",
+    status: "coming-soon" as const,
   },
   {
     pkg: "@pinace/mcp-server",
     who: "LLM tool use (Claude, GPT) — MCP compliant",
+    status: "coming-soon" as const,
   },
 ] as const;
 
-export const sdkSnippet = `const pinace = new PinaceClient({ signer: agentSigner, network: "mainnet" });
+export const sdkSnippet = `import { ActionKind, buildProposeAction, buildSettleAction, PACKAGE_IDS } from "@pinace/core";
+import { buildPolicyProves, spendingLimit, tokenWhitelist } from "@pinace/core/policies";
 
-const receipt = await pinace.proposeAction({
-  poolId: userPoolId,
-  action: { type: "swap", fromToken: "SUI", toToken: "USDC", amount: 100 },
-});
-
-await pinace.settle(receipt);`;
+// Agent proposes an action inside the pool you fund and own.
+const request = buildProposeAction({
+  tx, poolId,
+  packageId: PACKAGE_IDS.testnet,
+  kind: ActionKind.Swap,
+  coinInType: "0x2::sui::SUI",
+  coinOutType: USDC,
+  amountIn: 100_000_000n,
+  minAmountOut: 98_000_000n,
+  deadlineMs: BigInt(Date.now() + 60_000),
+});`;
 
 export const modelStats = [
   { to: 1, suffix: " click", label: "to revoke an agent" },
@@ -211,7 +221,7 @@ export const useCases = [
     k: "Pinace Agent",
     tone: "blue" as const,
     img: "/agents/app-detail.png",
-    avatar: "/agents/deepage.svg",
+    avatar: "/agents/fenik.svg",
     tag: "Proof of concept · trading",
     fn: "Conversational on-chain trading: natural-language intent → quote → policy pre-flight → atomic settlement, bounded by user-owned capabilities.",
     meta: "PoC",

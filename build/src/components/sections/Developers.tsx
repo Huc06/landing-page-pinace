@@ -29,7 +29,7 @@ export default function Developers() {
               <span className="h-3 w-3 rounded-full bg-yellow-400" />
               <span className="h-3 w-3 rounded-full bg-green-400" />
               <span className="ml-2 font-mono text-[12px] text-white/40">
-                agent.ts — @pinace/agent-sdk
+                agent.ts — @pinace/core
               </span>
             </div>
             <pre className="flex-1 whitespace-pre-wrap break-words p-6 font-mono text-[13px] leading-relaxed text-white/80">
@@ -40,17 +40,49 @@ export default function Developers() {
           {/* Right column: tiers + CTA */}
           <div className="flex flex-col gap-5">
             {/* SDK tiers */}
-            {sdkTiers.map((t) => (
-              <div
-                key={t.pkg}
-                className="rounded-xl border border-black/10 bg-[#f5f5f7] p-6 transition-colors hover:bg-[#ededf0]"
-              >
-                <p className="font-mono text-[14px] font-semibold text-[#a974ff]">
-                  {t.pkg}
-                </p>
-                <p className="mt-1.5 text-[15px] text-black/60">{t.who}</p>
-              </div>
-            ))}
+            {sdkTiers.map((t) => {
+              const published = t.status === "published";
+              const isLink = published && "href" in t && Boolean(t.href);
+              const card = (
+                <>
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="flex items-center gap-1.5 font-mono text-[14px] font-semibold text-[#a974ff]">
+                      {t.pkg}
+                      {isLink && (
+                        <ArrowUpRight className="size-3.5 text-[#a974ff]/60 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                      )}
+                    </p>
+                    {!published && (
+                      <span className="rounded-full border border-black/10 bg-black/[0.04] px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-black/35">
+                        Coming soon
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-1.5 text-[15px] text-black/60">{t.who}</p>
+                </>
+              );
+
+              return isLink ? (
+                <a
+                  key={t.pkg}
+                  href={(t as { href: string }).href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group rounded-xl border border-black/10 bg-[#f5f5f7] p-6 transition-colors hover:bg-[#ededf0]"
+                >
+                  {card}
+                </a>
+              ) : (
+                <div
+                  key={t.pkg}
+                  className={`rounded-xl border border-black/10 bg-[#f5f5f7] p-6 ${
+                    published ? "transition-colors hover:bg-[#ededf0]" : "opacity-60"
+                  }`}
+                >
+                  {card}
+                </div>
+              );
+            })}
 
             {/* CTA card */}
             <div className="flex flex-1 flex-col justify-center rounded-2xl bg-gradient-to-br from-[#0a0e1a] to-[#1a1f36] p-8">
