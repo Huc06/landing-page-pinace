@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { site } from "@/lib/site";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { AddToChromeButton } from "@/components/common/AddToChromeButton";
 
@@ -11,7 +12,9 @@ const navLinks = [
   { label: "How it works", href: "#model" },
   { label: "Build", href: "#use-cases" },
   { label: "Developers", href: "#developers" },
-  { label: "Docs", href: "#developers" },
+  // Docs is hosted as a separate Next/fumadocs app on Railway — open
+  // in a new tab so the landing nav doesn't lose its scroll position.
+  { label: "Docs", href: site.docsUrl, external: true },
 ];
 
 export default function Nav() {
@@ -76,6 +79,8 @@ export default function Nav() {
             <a
               key={item.href}
               href={item.href}
+              target={item.external ? "_blank" : undefined}
+              rel={item.external ? "noreferrer" : undefined}
               className={cn(
                 "flex items-center gap-1 font-[family-name:var(--font-instrument-sans)] text-sm font-medium transition-colors duration-300",
                 linkColor,
@@ -144,6 +149,8 @@ export default function Nav() {
           <a
             key={item.href}
             href={item.href}
+            target={item.external ? "_blank" : undefined}
+            rel={item.external ? "noreferrer" : undefined}
             onClick={() => setOpen(false)}
             className="border-b border-white/10 py-4 font-[family-name:var(--font-instrument-sans)] text-3xl font-semibold text-white"
           >

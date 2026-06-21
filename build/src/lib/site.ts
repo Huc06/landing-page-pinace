@@ -5,12 +5,13 @@ export const site = {
   name: "Pinace",
   tagline: "The Autonomous Agent Wallet on Sui",
   chromeStoreUrl: "#install",
-  docsUrl: "#developers",
+  // Live fumadocs site on Railway.
+  docsUrl: "https://pinace-docs-production.up.railway.app",
   githubUrl: "https://github.com/pinace-wallet",
   // Fenik — Pinace's reference agent POC. Conversational chat app
-  // that runs bounded DeepBook swaps via @pinace/agent-sdk. Lives on
-  // AWS; will move to https://fenik.one once DNS + TLS land.
-  pocAgentUrl: "http://54.80.234.72:3001",
+  // that runs bounded DeepBook swaps via @pinace/agent-sdk. Live on
+  // fenik.one (AWS EC2 + Cloudflare TLS).
+  pocAgentUrl: "https://fenik.one",
   pocAgentLive: true,
   nav: [
     { label: "Products", href: "#products" },
