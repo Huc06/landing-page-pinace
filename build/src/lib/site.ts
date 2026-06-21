@@ -7,10 +7,11 @@ export const site = {
   chromeStoreUrl: "#install",
   docsUrl: "#developers",
   githubUrl: "https://github.com/pinace-wallet",
-  // POC "Dex Agent" — a chat app on @pinace/agent-sdk that runs bounded swaps on
-  // DeepBook v3. Will be deployed; replace "#" with the live URL when it ships.
-  pocAgentUrl: "#",
-  pocAgentLive: false,
+  // Fenik — Pinace's reference agent POC. Conversational chat app
+  // that runs bounded DeepBook swaps via @pinace/agent-sdk. Lives on
+  // AWS; will move to https://fenik.one once DNS + TLS land.
+  pocAgentUrl: "http://54.80.234.72:3001",
+  pocAgentLive: true,
   nav: [
     { label: "Products", href: "#products" },
     { label: "How it works", href: "#how" },
@@ -21,7 +22,7 @@ export const site = {
 
 export const hero = {
   badge: "Built on Sui",
-  status: "Extension live on Chrome",
+  status: "Browser extension · early access",
   // headline is rendered as reveal rows; last word is the drenched-blue accent.
   headlineRows: ["Let AI trade", "for you — without", "handing over"],
   headlineAccent: "your keys.",
@@ -71,12 +72,12 @@ export const features = [
     body: "An indexer streams every action — success, reverted, pending — with explorer links you can verify.",
   },
   {
-    title: "Gasless via Enoki",
-    body: "Agent transactions are sponsored, so automation runs without you topping up gas every time.",
+    title: "Hot-potato settlement",
+    body: "Propose → policy check → settle, all in one atomic PTB. Break any rule and the whole transaction reverts.",
   },
   {
-    title: "zkLogin sign-in",
-    body: "Onboard with Google or Apple. A Sui address, no seed phrase to lose on day one.",
+    title: "Per-window spending cap",
+    body: "Cap spending per transaction and per time window. Move enforces the math on every swap.",
   },
 ] as const;
 
@@ -166,11 +167,11 @@ export const featureCards = [
   {
     n: "04",
     tone: "violet" as const,
-    kicker: "Frictionless",
+    kicker: "Transparency",
     feature: true,
-    title: "Audit timeline, gasless, zkLogin",
-    body: "An indexer streams every action with explorer links. Agent transactions are sponsored via Enoki, and you sign in with zkLogin — a Sui address, no seed phrase.",
-    tags: ["Audit log", "Gasless · Enoki", "zkLogin", "Indexed"],
+    title: "Audit timeline",
+    body: "An indexer streams every action — proposed, settled, reverted — with Suiscan links. You watch each fill land on chain in real time and can dispute or revoke any moment.",
+    tags: ["Indexed", "Real-time SSE", "Suiscan links"],
   },
 ] as const;
 
@@ -218,14 +219,14 @@ export const capabilities = [
 // `fn` = what each does *through the Pinace protocol*, revealed on hover.
 export const useCases = [
   {
-    k: "Pinace Agent",
+    k: "Fenik",
     tone: "blue" as const,
     img: "/agents/fenik.png",
     avatar: "/agents/deepage.svg",
     tag: "Proof of concept · trading",
-    fn: "Conversational on-chain trading: natural-language intent → quote → policy pre-flight → atomic settlement, bounded by user-owned capabilities.",
-    meta: "PoC",
-    desc: "Conversational on-chain trading on Sui. Natural-language intent → quote → policy pre-flight → atomic settlement, all bounded by user-owned capabilities attached on chain. Part of the Pinace stack: Frontend (wallet extension) · Backend (indexer) · @pinace/core (SDK).",
+    fn: "Chat with an agent that quotes DeepBook, checks your policy, and submits the swap — all in one signed PTB.",
+    meta: "PoC · live",
+    desc: "Pinace's reference agent. You chat — Fenik quotes DeepBook, pre-flights your spending limit, and asks Pinace Wallet to sign one atomic PTB. Every swap stays inside the budget you set.",
     tags: ["PoC", "DeepBook v3", "Conversational", "Bounded"],
   },
   {
@@ -335,7 +336,7 @@ export const ideas = [
 export const faqs = [
   {
     q: "Do I give the agent my private key?",
-    a: "No. You fund a BalancePool and attach a policy. The agent acts inside that pool via a session key — your main key never leaves your wallet.",
+    a: "No. You fund a BalancePool and attach a policy. The agent uses its own scoped keypair to act inside that pool — your owner key never leaves your wallet.",
   },
   {
     q: "What happens when I revoke?",
@@ -347,7 +348,7 @@ export const faqs = [
   },
   {
     q: "Is there a mobile app?",
-    a: "The browser extension is live today. A mobile app is coming soon — join the waitlist below and we'll let you know.",
+    a: "Early access of the browser extension is shipping now; mobile is on the roadmap. Join the waitlist below to be notified.",
   },
   {
     q: "Can I build my own policy or agent?",
@@ -355,6 +356,6 @@ export const faqs = [
   },
   {
     q: "Which networks and protocols are supported?",
-    a: "Pinace is protocol-agnostic and gates any Sui Move call. The reference agent trades on DeepBook v3, with Walrus, Seal, Pyth, zkLogin and Enoki in the stack.",
+    a: "Pinace runs on Sui testnet today, with mainnet next. The protocol gates any Sui Move call; the reference agent (Fenik) trades on DeepBook v3. More venues — Cetus, Aftermath — coming as the SDK matures.",
   },
 ] as const;

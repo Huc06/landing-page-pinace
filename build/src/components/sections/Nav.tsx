@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
+import { AddToChromeButton } from "@/components/common/AddToChromeButton";
 
 const navLinks = [
   { label: "Products", href: "#products", hasDropdown: true },
@@ -72,8 +73,7 @@ export default function Nav() {
 
         {/* Right — CTA button */}
         <div className="flex items-center gap-4">
-          <a
-            href="#install"
+          <AddToChromeButton
             className={cn(
               "rounded-full px-5 py-2.5 font-[family-name:var(--font-instrument-sans)] text-sm font-semibold transition-all duration-300 hover:scale-105",
               scrolled
@@ -82,7 +82,7 @@ export default function Nav() {
             )}
           >
             Add to Chrome
-          </a>
+          </AddToChromeButton>
         </div>
 
         {/* Mobile hamburger */}
@@ -134,13 +134,11 @@ export default function Nav() {
             {item.label}
           </a>
         ))}
-        <a
-          href="#install"
-          onClick={() => setOpen(false)}
+        <AddToChromeButton
           className="mt-6 rounded-full bg-white px-5 py-3 text-center font-[family-name:var(--font-instrument-sans)] text-base font-semibold text-black"
         >
           Add to Chrome
-        </a>
+        </AddToChromeButton>
       </div>
     </header>
   );

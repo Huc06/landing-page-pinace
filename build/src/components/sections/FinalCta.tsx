@@ -6,6 +6,7 @@ import { SplitHeading } from "@/components/common/SplitHeading";
 import { buttonVariants } from "@/components/ui/button";
 import { site } from "@/lib/site";
 import { cn } from "@/lib/utils";
+import { AddToChromeButton } from "@/components/common/AddToChromeButton";
 
 export default function FinalCta() {
   const [sent, setSent] = useState(false);
@@ -25,15 +26,14 @@ export default function FinalCta() {
         </p>
 
         <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
-          <a
-            href={site.chromeStoreUrl}
+          <AddToChromeButton
             className={cn(
               buttonVariants(),
               "h-12 rounded-full bg-primary px-8 text-base font-medium text-primary-foreground shadow-[0_8px_40px_-8px] shadow-primary/60 hover:bg-primary/90",
             )}
           >
             Add to Chrome
-          </a>
+          </AddToChromeButton>
           <a
             href={site.githubUrl}
             className={cn(

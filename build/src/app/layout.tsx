@@ -63,6 +63,15 @@ export const metadata: Metadata = {
     description:
       "Give an AI agent a budget and a rulebook, not your private key. On-chain limits, one-click revoke.",
   },
+  // Browser tab + bookmark icon. SVG covers modern browsers; falls
+  // back to /favicon.ico for legacy.
+  icons: {
+    icon: [
+      { url: "/brand/pinace-logo.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "any" },
+    ],
+    apple: "/brand/pinace-logo.svg",
+  },
 };
 
 export default function RootLayout({

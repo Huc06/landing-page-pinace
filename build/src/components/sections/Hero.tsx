@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { motion } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import Hls from "hls.js";
+import { AddToChromeButton } from "@/components/common/AddToChromeButton";
 
 const videoSrc =
   "https://stream.mux.com/T6oQJQ02cQ6N01TR6iHwZkKFkbepS34dkkIc9iukgy400g.m3u8";
@@ -106,17 +107,14 @@ export default function Hero() {
           className="flex flex-col items-center gap-6 sm:flex-row"
         >
           {/* Primary Button */}
-          <a
-            href="#install"
-            className="group flex items-center gap-3 rounded-full bg-white pl-6 pr-2 py-2 transition-all hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:scale-105"
-          >
+          <AddToChromeButton className="group flex items-center gap-3 rounded-full bg-white pl-6 pr-2 py-2 transition-all hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:scale-105">
             <span className="font-[family-name:var(--font-instrument-sans)] text-lg font-medium text-[#0a0400]">
               Add to Chrome
             </span>
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#3054ff] transition-colors group-hover:bg-[#2040e0]">
               <ArrowRight className="size-5 text-white" />
             </span>
-          </a>
+          </AddToChromeButton>
 
           {/* Secondary Button */}
           <a
