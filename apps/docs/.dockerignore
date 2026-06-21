@@ -1,0 +1,7 @@
+node_modules
+.next
+.source
+.turbo
+.vercel
+*.log
+.DS_Store
