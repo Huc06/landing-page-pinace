@@ -144,9 +144,7 @@ export default function UseCases() {
                   </span>
                 </span>
               </span>
-              <span className="hidden flex-none text-right font-mono text-[13px] text-foreground/30 md:block">
-                {u.meta}
-              </span>
+              <MetaBadge meta={u.meta} className="hidden flex-none md:inline-flex" />
             </button>
           ))}
         </div>
@@ -233,7 +231,7 @@ export default function UseCases() {
                 {current.tags.map((t) => (
                   <span
                     key={t}
-                    className="rounded-full border border-border px-3 py-1 font-mono text-[12px] text-foreground/60"
+                    className="inline-flex items-center rounded-full border border-border/70 bg-foreground/[0.04] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-foreground/70"
                   >
                     {t}
                   </span>
@@ -244,5 +242,46 @@ export default function UseCases() {
         </div>
       )}
     </section>
+  );
+}
+
+/**
+ * Per-row status badge. Auto-detects whether the meta string contains
+ * "live" — if so, splits into a kind chip ("PoC") and a green LIVE
+ * pill so visitors immediately see which row they can actually try.
+ * Plain rows render a single neutral chip.
+ */
+function MetaBadge({ meta, className }: { meta: string; className?: string }) {
+  const isLive = /live/i.test(meta);
+  const cls =
+    "items-center rounded-full border px-2.5 py-1 text-[10.5px] font-medium uppercase tracking-[0.18em]";
+
+  if (isLive) {
+    // "PoC · live" → kind = "PoC", split out the live state into its
+    // own pill so the colour treatment carries the meaning.
+    const kind = meta.replace(/[·•|]\s*live/i, "").trim() || "POC";
+    return (
+      <span className={`gap-1.5 ${className ?? ""} inline-flex`}>
+        <span
+          className={`${cls} border-border bg-foreground/[0.04] text-foreground/70`}
+        >
+          {kind}
+        </span>
+        <span
+          className={`${cls} inline-flex border-emerald-400/30 bg-emerald-400/10 text-emerald-300`}
+        >
+          <span className="mr-1.5 size-1.5 rounded-full bg-emerald-300 shadow-[0_0_6px_currentColor]" />
+          Live
+        </span>
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className={`${cls} ${className ?? ""} border-border bg-foreground/[0.04] text-foreground/65`}
+    >
+      {meta}
+    </span>
   );
 }
