@@ -8,8 +8,9 @@ import {
   useEffect,
   useSyncExternalStore,
 } from "react";
+import { ArrowUpRight } from "lucide-react";
 import { prefersReducedMotion } from "@/lib/gsap";
-import { useCases } from "@/lib/site";
+import { useCases, site } from "@/lib/site";
 
 // Subscribe to the (hover: hover) capability without an SSR hydration mismatch.
 const HOVER_QUERY = "(hover: hover) and (pointer: fine)";
@@ -91,6 +92,20 @@ export default function UseCases() {
             Apps and agents that use the Pinace protocol. A user deposits into a
             pool, confirms a policy, and automation runs within those bounds.
           </p>
+
+          {/* CTA — Fenik is the only LIVE agent right now; surface it
+              up here so a visitor doesn't have to scan the table to
+              find the one they can actually try. */}
+          <a
+            href={site.pocAgentUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="group mt-7 inline-flex items-center gap-2.5 rounded-full bg-pinace-blue px-6 py-3 text-[15px] font-semibold text-white shadow-[0_8px_24px_-8px_rgba(0,111,238,0.6)] transition-all duration-300 hover:scale-105 hover:shadow-[0_12px_32px_-8px_rgba(0,111,238,0.7)]"
+          >
+            <span className="size-1.5 rounded-full bg-emerald-300 shadow-[0_0_8px_currentColor]" />
+            Try our agent POC
+            <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </a>
         </div>
 
         {/* Agent rows */}
