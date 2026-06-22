@@ -121,41 +121,72 @@ export function BlueMeshBg() {
           sizes + depths + speeds for parallax. Far boat on horizon
           (small, slow, high), mid boat (medium), near boat
           (largest, fastest, lowest, soft glow). */}
-      {/* Five boats, all riding inside the wave band (bottom 50% of
-          the viewport). Each lane sits above a specific wave layer so
-          the bob keeps the boat on the crest as the swell drifts. */}
+      {/* Nine glowing Pinace sailboats riding inside the wave band
+          (bottom 50% of the viewport). Each has its own lane height,
+          cross speed, bob speed, and start delay so the fleet looks
+          like a regatta drifting past rather than a marching line.
+          Every boat carries a white-neon drop-shadow stack from
+          <BoatSvg glow/> — bright crest against the deep navy water. */}
       <div className="boat-lane far-a">
-        <div className="boat-tack tack-far">
+        <div className="boat-tack tack-far-a">
           <div className="boat-bob bob-far">
-            <BoatSvg size={24} opacity={0.45} />
+            <BoatSvg size={22} opacity={0.55} glow />
           </div>
         </div>
       </div>
       <div className="boat-lane far-b">
-        <div className="boat-tack tack-far-2">
+        <div className="boat-tack tack-far-b">
           <div className="boat-bob bob-far">
-            <BoatSvg size={28} opacity={0.55} />
+            <BoatSvg size={26} opacity={0.6} glow />
+          </div>
+        </div>
+      </div>
+      <div className="boat-lane far-c">
+        <div className="boat-tack tack-far-c">
+          <div className="boat-bob bob-far">
+            <BoatSvg size={20} opacity={0.5} glow />
           </div>
         </div>
       </div>
       <div className="boat-lane mid-a">
-        <div className="boat-tack tack-mid">
+        <div className="boat-tack tack-mid-a">
           <div className="boat-bob bob-mid">
-            <BoatSvg size={40} opacity={0.8} />
+            <BoatSvg size={38} opacity={0.8} glow />
           </div>
         </div>
       </div>
       <div className="boat-lane mid-b">
-        <div className="boat-tack tack-mid-2">
+        <div className="boat-tack tack-mid-b">
           <div className="boat-bob bob-mid">
-            <BoatSvg size={44} opacity={0.9} />
+            <BoatSvg size={42} opacity={0.85} glow />
           </div>
         </div>
       </div>
-      <div className="boat-lane near">
-        <div className="boat-tack tack-near">
+      <div className="boat-lane mid-c">
+        <div className="boat-tack tack-mid-c">
+          <div className="boat-bob bob-mid">
+            <BoatSvg size={36} opacity={0.78} glow />
+          </div>
+        </div>
+      </div>
+      <div className="boat-lane near-a">
+        <div className="boat-tack tack-near-a">
           <div className="boat-bob bob-near">
-            <BoatSvg size={60} opacity={1} glow />
+            <BoatSvg size={58} opacity={0.95} glow />
+          </div>
+        </div>
+      </div>
+      <div className="boat-lane near-b">
+        <div className="boat-tack tack-near-b">
+          <div className="boat-bob bob-near">
+            <BoatSvg size={64} opacity={1} glow />
+          </div>
+        </div>
+      </div>
+      <div className="boat-lane near-c">
+        <div className="boat-tack tack-near-c">
+          <div className="boat-bob bob-near">
+            <BoatSvg size={50} opacity={0.9} glow />
           </div>
         </div>
       </div>
@@ -286,23 +317,32 @@ export function BlueMeshBg() {
           z-index: 1;
           pointer-events: none;
         }
-        .boat-lane.far-a { bottom: 45%; height: 24px; }
-        .boat-lane.far-b { bottom: 42%; height: 28px; }
-        .boat-lane.mid-a { bottom: 35%; height: 40px; }
-        .boat-lane.mid-b { bottom: 30%; height: 44px; }
-        .boat-lane.near  { bottom: 20%; height: 60px; }
+        .boat-lane.far-a  { bottom: 48%; height: 22px; }
+        .boat-lane.far-b  { bottom: 44%; height: 26px; }
+        .boat-lane.far-c  { bottom: 40%; height: 20px; }
+        .boat-lane.mid-a  { bottom: 35%; height: 38px; }
+        .boat-lane.mid-b  { bottom: 32%; height: 42px; }
+        .boat-lane.mid-c  { bottom: 28%; height: 36px; }
+        .boat-lane.near-a { bottom: 23%; height: 58px; }
+        .boat-lane.near-b { bottom: 18%; height: 64px; }
+        .boat-lane.near-c { bottom: 14%; height: 50px; }
 
         .boat-tack {
           position: absolute;
           will-change: transform;
         }
-        /* All boats run right → left. Different periods + staggered
-           delays so they never form a marching line. */
-        .tack-far     { right: 0; animation: boat-cross-rtl 78s linear infinite; animation-delay: -10s; }
-        .tack-far-2   { right: 0; animation: boat-cross-rtl 64s linear infinite; animation-delay: -40s; }
-        .tack-mid     { right: 0; animation: boat-cross-rtl 52s linear infinite; animation-delay: -25s; }
-        .tack-mid-2   { right: 0; animation: boat-cross-rtl 42s linear infinite; animation-delay: -5s; }
-        .tack-near    { right: 0; animation: boat-cross-rtl 32s linear infinite; animation-delay: -8s; }
+        /* All boats sail right → left. Periods + delays staggered so
+           the fleet drifts past at varying speeds — far boats slower
+           (horizon parallax), near boats faster. */
+        .tack-far-a   { right: 0; animation: boat-cross-rtl 82s linear infinite; animation-delay: -10s; }
+        .tack-far-b   { right: 0; animation: boat-cross-rtl 70s linear infinite; animation-delay: -42s; }
+        .tack-far-c   { right: 0; animation: boat-cross-rtl 88s linear infinite; animation-delay: -60s; }
+        .tack-mid-a   { right: 0; animation: boat-cross-rtl 56s linear infinite; animation-delay: -25s; }
+        .tack-mid-b   { right: 0; animation: boat-cross-rtl 48s linear infinite; animation-delay: -8s; }
+        .tack-mid-c   { right: 0; animation: boat-cross-rtl 62s linear infinite; animation-delay: -38s; }
+        .tack-near-a  { right: 0; animation: boat-cross-rtl 36s linear infinite; animation-delay: -4s; }
+        .tack-near-b  { right: 0; animation: boat-cross-rtl 32s linear infinite; animation-delay: -18s; }
+        .tack-near-c  { right: 0; animation: boat-cross-rtl 40s linear infinite; animation-delay: -27s; }
 
         @keyframes boat-cross-rtl {
           from { transform: translateX(120px); }
@@ -359,9 +399,13 @@ function BoatSvg({
       viewBox="0 0 64 64"
       style={{
         opacity,
+        // Stacked drop-shadows fake a neon-white glow: a tight inner
+        // halo (3px white) + a soft outer bloom (12px white) + a wide
+        // sky-blue ambient (28px). Reads as a glowing sail against
+        // the dark ocean.
         filter: glow
-          ? "drop-shadow(0 6px 16px rgba(122, 160, 255, 0.55))"
-          : "drop-shadow(0 3px 8px rgba(60, 100, 200, 0.35))",
+          ? "drop-shadow(0 0 3px rgba(255,255,255,0.9)) drop-shadow(0 0 12px rgba(255,255,255,0.5)) drop-shadow(0 0 28px rgba(122,160,255,0.55))"
+          : "drop-shadow(0 0 6px rgba(255,255,255,0.6)) drop-shadow(0 0 14px rgba(122,160,255,0.4))",
       }}
     >
       <g fill="#fff">
