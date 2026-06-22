@@ -15,7 +15,9 @@ export const metadata: Metadata = {
   title: { default: 'Pinace Docs', template: '%s · Pinace Docs' },
   description:
     'Build with Pinace — the autonomous-agent wallet on Sui. Wallet APIs, @pinace/core SDK, indexer, and venue integrations.',
-  icons: { icon: '/icon.svg' },
+  // Favicon comes from app/icon.png via file-convention — no manual
+  // `icons` override here, otherwise it pins the link rel="icon"
+  // back to the old SVG path that no longer exists.
 };
 
 export default function Layout({ children }: LayoutProps<'/'>) {
