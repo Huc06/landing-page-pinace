@@ -74,7 +74,7 @@ export default function Hero() {
           transition={{ delay: 0.5, duration: 0.6 }}
           className="max-w-[64rem] font-[family-name:var(--font-instrument-sans)] text-sm sm:text-base md:text-lg leading-[1.65] text-white md:whitespace-nowrap"
         >
-          On-chain policy enforcement · one-click revoke · never custodial · built on Sui Move.
+          On-chain policy enforcement<span className="mx-3 text-white/35">·</span>one-click revoke<span className="mx-3 text-white/35">·</span>never custodial<span className="mx-3 text-white/35">·</span>built on Sui Move.
         </motion.p>
 
         {/* CTA Buttons */}
