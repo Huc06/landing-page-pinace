@@ -227,12 +227,14 @@ export default function UseCases() {
               <p className="mt-5 text-[15.5px] leading-relaxed text-foreground/60">
                 {current.desc}
               </p>
-              <div className="mt-6 flex flex-wrap gap-2">
-                {current.tags.map((t) => (
-                  <span
-                    key={t}
-                    className="inline-flex items-center rounded-full border border-border/70 bg-foreground/[0.04] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-foreground/70"
-                  >
+              <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-1.5 font-[family-name:var(--font-instrument-sans)] text-[13px] text-foreground/55">
+                {current.tags.map((t, idx) => (
+                  <span key={t} className="inline-flex items-center gap-3">
+                    {idx > 0 && (
+                      <span aria-hidden className="text-foreground/20">
+                        ·
+                      </span>
+                    )}
                     {t}
                   </span>
                 ))}
@@ -246,42 +248,24 @@ export default function UseCases() {
 }
 
 /**
- * Per-row status badge. Auto-detects whether the meta string contains
- * "live" — if so, splits into a kind chip ("PoC") and a green LIVE
- * pill so visitors immediately see which row they can actually try.
- * Plain rows render a single neutral chip.
+ * Per-row status label. Matches the editorial vibe of the rest of
+ * the landing — small mixed-case text in Instrument Sans, no
+ * aggressive uppercase/letter-spacing. The live row gets a soft
+ * green dot prefix; everything else is a quiet hairline label.
  */
 function MetaBadge({ meta, className }: { meta: string; className?: string }) {
   const isLive = /live/i.test(meta);
-  const cls =
-    "items-center rounded-full border px-2.5 py-1 text-[10.5px] font-medium uppercase tracking-[0.18em]";
-
-  if (isLive) {
-    // "PoC · live" → kind = "PoC", split out the live state into its
-    // own pill so the colour treatment carries the meaning.
-    const kind = meta.replace(/[·•|]\s*live/i, "").trim() || "POC";
-    return (
-      <span className={`gap-1.5 ${className ?? ""} inline-flex`}>
-        <span
-          className={`${cls} border-border bg-foreground/[0.04] text-foreground/70`}
-        >
-          {kind}
-        </span>
-        <span
-          className={`${cls} inline-flex border-emerald-400/30 bg-emerald-400/10 text-emerald-300`}
-        >
-          <span className="mr-1.5 size-1.5 rounded-full bg-emerald-300 shadow-[0_0_6px_currentColor]" />
-          Live
-        </span>
-      </span>
-    );
-  }
+  const kind = isLive ? meta.replace(/[·•|]\s*live/i, "").trim() : meta;
 
   return (
     <span
-      className={`${cls} ${className ?? ""} border-border bg-foreground/[0.04] text-foreground/65`}
+      className={`inline-flex items-center gap-2 font-[family-name:var(--font-instrument-sans)] text-[14px] font-medium text-foreground/55 ${className ?? ""}`}
     >
-      {meta}
+      {isLive && (
+        <span className="size-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(74,222,128,0.7)]" />
+      )}
+      <span>{kind}</span>
+      {isLive && <span className="text-emerald-400">Live</span>}
     </span>
   );
 }
