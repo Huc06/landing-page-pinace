@@ -54,13 +54,16 @@ export default function Hero() {
 
         {/* Moat — single-line distinction. max-w bumped so the two
             clauses sit on one row at desktop width. */}
+        {/* Moat — wraps freely on mobile (each sentence falls onto its
+            own line). One-line on md+ for the desktop punch. */}
         <motion.p
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35, duration: 0.5 }}
-          className="max-w-[68rem] font-[family-name:var(--font-instrument-sans)] text-lg sm:text-xl md:text-2xl font-medium leading-[1.35] text-white whitespace-nowrap"
+          className="max-w-[68rem] px-2 font-[family-name:var(--font-instrument-sans)] text-lg sm:text-xl md:text-2xl font-medium leading-[1.4] text-white md:whitespace-nowrap"
         >
           Other agent wallets hand the AI your keys.{" "}
+          <br className="md:hidden" />
           <span className="text-[#85a8ff]">Pinace gives it a budget and a rulebook.</span>
         </motion.p>
 
