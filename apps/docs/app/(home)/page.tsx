@@ -41,8 +41,17 @@ export default function HomePage() {
         className="bg-glow pointer-events-none absolute inset-x-0 top-0 -z-10 h-[480px]"
       />
 
-      <p className="mb-4 text-xs font-medium uppercase tracking-[0.18em] text-fd-muted-foreground">
-        Pinace · Build on Sui
+      <p className="mb-4 inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-fd-muted-foreground">
+        Pinace · Build on
+        <img
+          src="/brand/sui-logo.png"
+          alt=""
+          width={14}
+          height={14}
+          className="inline-block"
+          aria-hidden
+        />
+        Sui
       </p>
       <h1 className="max-w-3xl text-balance text-center text-4xl font-medium leading-[1.05] tracking-tight sm:text-6xl">
         AI agents that trade for users,{' '}
