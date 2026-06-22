@@ -199,7 +199,7 @@ export function BlueMeshBg() {
         className="absolute inset-x-0 bottom-0 w-full pointer-events-none"
         viewBox="0 0 2400 400"
         preserveAspectRatio="none"
-        style={{ height: "60vh" }}
+        style={{ height: "72vh" }}
       >
         <defs>
           <linearGradient id="waveA" x1="0" y1="0" x2="0" y2="1">
@@ -317,15 +317,20 @@ export function BlueMeshBg() {
           z-index: 1;
           pointer-events: none;
         }
-        .boat-lane.far-a  { bottom: 48%; height: 22px; }
-        .boat-lane.far-b  { bottom: 44%; height: 26px; }
-        .boat-lane.far-c  { bottom: 40%; height: 20px; }
-        .boat-lane.mid-a  { bottom: 35%; height: 38px; }
-        .boat-lane.mid-b  { bottom: 32%; height: 42px; }
-        .boat-lane.mid-c  { bottom: 28%; height: 36px; }
-        .boat-lane.near-a { bottom: 23%; height: 58px; }
-        .boat-lane.near-b { bottom: 18%; height: 64px; }
-        .boat-lane.near-c { bottom: 14%; height: 50px; }
+        /* Wave SVG is 72vh tall (anchored bottom). Visible crests
+           sit roughly between 10% (foreground wave-d crest) and 42%
+           (background wave-a crest) of the viewport from bottom.
+           Every boat lane pinned inside that band so the fleet
+           rides the actual water surface — never the dark sky. */
+        .boat-lane.far-a  { bottom: 41%; height: 22px; }
+        .boat-lane.far-b  { bottom: 37%; height: 26px; }
+        .boat-lane.far-c  { bottom: 34%; height: 20px; }
+        .boat-lane.mid-a  { bottom: 28%; height: 38px; }
+        .boat-lane.mid-b  { bottom: 24%; height: 42px; }
+        .boat-lane.mid-c  { bottom: 21%; height: 36px; }
+        .boat-lane.near-a { bottom: 17%; height: 58px; }
+        .boat-lane.near-b { bottom: 12%; height: 64px; }
+        .boat-lane.near-c { bottom: 9%;  height: 50px; }
 
         .boat-tack {
           position: absolute;
