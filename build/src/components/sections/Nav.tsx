@@ -1,14 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { site } from "@/lib/site";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { AddToChromeButton } from "@/components/common/AddToChromeButton";
 
 const navLinks = [
-  { label: "Products", href: "#products", hasDropdown: true },
+  { label: "Products", href: "#products" },
   { label: "How it works", href: "#model" },
   { label: "Build", href: "#use-cases" },
   { label: "Developers", href: "#developers" },
@@ -87,7 +86,6 @@ export default function Nav() {
               )}
             >
               {item.label}
-              {item.hasDropdown && <ChevronDown className="size-3.5" />}
             </a>
           ))}
         </nav>

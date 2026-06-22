@@ -94,22 +94,41 @@ export function BlueMeshBg() {
           sizes + depths + speeds for parallax. Far boat on horizon
           (small, slow, high), mid boat (medium), near boat
           (largest, fastest, lowest, soft glow). */}
-      <div className="boat-lane far">
+      {/* Five boats, all riding inside the wave band (bottom 50% of
+          the viewport). Each lane sits above a specific wave layer so
+          the bob keeps the boat on the crest as the swell drifts. */}
+      <div className="boat-lane far-a">
         <div className="boat-tack tack-far">
-          <BoatSvg size={32} opacity={0.55} />
+          <div className="boat-bob bob-far">
+            <BoatSvg size={24} opacity={0.45} />
+          </div>
         </div>
       </div>
-      <div className="boat-lane mid">
+      <div className="boat-lane far-b">
+        <div className="boat-tack tack-far-2">
+          <div className="boat-bob bob-far">
+            <BoatSvg size={28} opacity={0.55} />
+          </div>
+        </div>
+      </div>
+      <div className="boat-lane mid-a">
         <div className="boat-tack tack-mid">
           <div className="boat-bob bob-mid">
-            <BoatSvg size={44} opacity={0.85} />
+            <BoatSvg size={40} opacity={0.8} />
+          </div>
+        </div>
+      </div>
+      <div className="boat-lane mid-b">
+        <div className="boat-tack tack-mid-2">
+          <div className="boat-bob bob-mid">
+            <BoatSvg size={44} opacity={0.9} />
           </div>
         </div>
       </div>
       <div className="boat-lane near">
         <div className="boat-tack tack-near">
           <div className="boat-bob bob-near">
-            <BoatSvg size={64} opacity={1} glow />
+            <BoatSvg size={60} opacity={1} glow />
           </div>
         </div>
       </div>
@@ -198,73 +217,58 @@ export function BlueMeshBg() {
           }
         }
 
-        /* Boat lanes — each pinned at a different height so parallax
-           depth feels right (further away = higher in the frame). */
+        /* Boat lanes — every boat lives inside the wave band (bottom
+           half of the viewport) so they look like they're floating on
+           water, never hovering above the horizon. */
         .boat-lane {
           position: absolute;
           inset-inline: 0;
           z-index: 1;
           pointer-events: none;
         }
-        .boat-lane.far {
-          top: 38%;
-          height: 32px;
-        }
-        .boat-lane.mid {
-          top: 50%;
-          height: 44px;
-        }
-        .boat-lane.near {
-          bottom: 22%;
-          height: 64px;
-        }
+        .boat-lane.far-a { bottom: 45%; height: 24px; }
+        .boat-lane.far-b { bottom: 42%; height: 28px; }
+        .boat-lane.mid-a { bottom: 35%; height: 40px; }
+        .boat-lane.mid-b { bottom: 30%; height: 44px; }
+        .boat-lane.near  { bottom: 20%; height: 60px; }
+
         .boat-tack {
           position: absolute;
           will-change: transform;
         }
-        /* All boats run right → left (translateX from +viewport to
-           -boat-width). Different periods → no marching-band effect. */
-        .tack-far {
-          right: 0;
-          animation: boat-cross-rtl 70s linear infinite;
-          animation-delay: -10s;
-        }
-        .tack-mid {
-          right: 0;
-          animation: boat-cross-rtl 48s linear infinite;
-          animation-delay: -25s;
-        }
-        .tack-near {
-          right: 0;
-          animation: boat-cross-rtl 32s linear infinite;
-          animation-delay: -8s;
-        }
+        /* All boats run right → left. Different periods + staggered
+           delays so they never form a marching line. */
+        .tack-far     { right: 0; animation: boat-cross-rtl 78s linear infinite; animation-delay: -10s; }
+        .tack-far-2   { right: 0; animation: boat-cross-rtl 64s linear infinite; animation-delay: -40s; }
+        .tack-mid     { right: 0; animation: boat-cross-rtl 52s linear infinite; animation-delay: -25s; }
+        .tack-mid-2   { right: 0; animation: boat-cross-rtl 42s linear infinite; animation-delay: -5s; }
+        .tack-near    { right: 0; animation: boat-cross-rtl 32s linear infinite; animation-delay: -8s; }
+
         @keyframes boat-cross-rtl {
-          from {
-            transform: translateX(120px);
-          }
-          to {
-            transform: translateX(-105vw);
-          }
+          from { transform: translateX(120px); }
+          to   { transform: translateX(-105vw); }
         }
         .boat-bob {
           will-change: transform;
         }
-        .bob-mid {
-          animation: bob 5.4s ease-in-out infinite;
-        }
+        /* Bob periods sync roughly with the wave-swell periods (10–28s
+           range) so each boat rises and falls with the swell rather
+           than ticking on its own clock. */
+        .bob-far { animation: bob-soft 8.5s ease-in-out infinite; }
+        .bob-mid { animation: bob 6s ease-in-out infinite; }
         .bob-near {
-          animation: bob 4.2s ease-in-out infinite;
+          animation: bob 4.6s ease-in-out infinite;
           animation-delay: -1s;
         }
+        /* Bigger bob amplitude for near boat (more visible), softer
+           for far boats (depth illusion). */
         @keyframes bob {
-          0%,
-          100% {
-            transform: translateY(0) rotate(-1deg);
-          }
-          50% {
-            transform: translateY(-5px) rotate(1deg);
-          }
+          0%, 100% { transform: translateY(0) rotate(-1.5deg); }
+          50%      { transform: translateY(-7px) rotate(1.5deg); }
+        }
+        @keyframes bob-soft {
+          0%, 100% { transform: translateY(0) rotate(-0.6deg); }
+          50%      { transform: translateY(-3px) rotate(0.6deg); }
         }
 
         @media (prefers-reduced-motion: reduce) {

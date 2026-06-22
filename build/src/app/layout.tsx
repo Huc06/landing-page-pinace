@@ -37,7 +37,7 @@ const instrumentSerif = Instrument_Serif({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://pinace.xyz"),
-  title: "Pinace — Let AI trade for you, without handing over your keys",
+  title: "Pinace Wallet",
   description:
     "Pinace is the autonomous agent wallet on Sui. Delegate a budget and a rulebook to AI agents — limits enforced by Move smart contracts, revocable in one click. Non-custodial by design.",
   keywords: [

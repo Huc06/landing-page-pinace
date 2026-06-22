@@ -35,7 +35,7 @@ export default function Model() {
 
           {/* Right — content */}
           <div>
-            <h2 className="font-heading text-[clamp(2.4rem,5vw,4.2rem)] font-bold leading-[0.95] tracking-tight text-foreground">
+            <h2 className="font-heading text-[clamp(2.4rem,5vw,4.2rem)] font-bold leading-[1.08] tracking-tight text-foreground">
               Delegate without
               <br />
               handing over keys
