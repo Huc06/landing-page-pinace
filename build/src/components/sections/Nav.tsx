@@ -6,14 +6,14 @@ import { site } from "@/lib/site";
 import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { AddToChromeButton } from "@/components/common/AddToChromeButton";
 
-const navLinks = [
+// Docs collapsed back into the Developers section — they're the same
+// audience and the nav was redundant. The Developers CTA (in-page)
+// links out to the Railway docs site.
+const navLinks: Array<{ label: string; href: string; external?: boolean }> = [
   { label: "Products", href: "#products" },
   { label: "How it works", href: "#model" },
   { label: "Build", href: "#use-cases" },
   { label: "Developers", href: "#developers" },
-  // Docs is hosted as a separate Next/fumadocs app on Railway — open
-  // in a new tab so the landing nav doesn't lose its scroll position.
-  { label: "Docs", href: site.docsUrl, external: true },
 ];
 
 export default function Nav() {
@@ -80,6 +80,7 @@ export default function Nav() {
               href={item.href}
               target={item.external ? "_blank" : undefined}
               rel={item.external ? "noreferrer" : undefined}
+              onClick={smoothScrollIfAnchor}
               className={cn(
                 "flex items-center gap-1 font-[family-name:var(--font-instrument-sans)] text-sm font-medium transition-colors duration-300",
                 linkColor,
@@ -149,7 +150,10 @@ export default function Nav() {
             href={item.href}
             target={item.external ? "_blank" : undefined}
             rel={item.external ? "noreferrer" : undefined}
-            onClick={() => setOpen(false)}
+            onClick={(e) => {
+              setOpen(false);
+              smoothScrollIfAnchor(e);
+            }}
             className="border-b border-white/10 py-4 font-[family-name:var(--font-instrument-sans)] text-3xl font-semibold text-white"
           >
             {item.label}
@@ -163,4 +167,21 @@ export default function Nav() {
       </div>
     </header>
   );
+}
+
+/**
+ * For in-page anchor links (`#section-id`): intercept the click,
+ * scroll the target into view smoothly, and **don't** mutate the URL
+ * hash. The user asked for clean URLs — no `#products` lingering in
+ * the address bar after clicking. External links pass through.
+ */
+function smoothScrollIfAnchor(
+  e: React.MouseEvent<HTMLAnchorElement>,
+) {
+  const href = e.currentTarget.getAttribute("href");
+  if (!href || !href.startsWith("#")) return; // external / non-anchor
+  const target = document.querySelector(href);
+  if (!target) return;
+  e.preventDefault();
+  target.scrollIntoView({ behavior: "smooth", block: "start" });
 }

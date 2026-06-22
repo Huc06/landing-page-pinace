@@ -4,6 +4,7 @@ import { motion } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import { AddToChromeButton } from "@/components/common/AddToChromeButton";
 import { BlueMeshBg } from "@/components/common/BlueMeshBg";
+import { site } from "@/lib/site";
 
 export default function Hero() {
   return (
@@ -90,9 +91,12 @@ export default function Hero() {
             </span>
           </AddToChromeButton>
 
-          {/* Secondary Button */}
+          {/* Secondary — opens the live Railway docs in a new tab so
+              the landing keeps its scroll position. */}
           <a
-            href="#developers"
+            href={site.docsUrl}
+            target="_blank"
+            rel="noreferrer"
             className="group flex items-center gap-2 rounded-lg px-4 py-2 text-white/70 backdrop-blur-sm transition-all hover:bg-white/5 hover:text-white"
           >
             <span className="font-[family-name:var(--font-instrument-sans)] text-lg font-medium">
