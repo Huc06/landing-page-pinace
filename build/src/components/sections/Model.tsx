@@ -1,18 +1,15 @@
 import Image from "next/image";
-import { ArrowUpRight } from "lucide-react";
 import { Reveal } from "@/components/common/Reveal";
 
 export default function Model() {
   return (
     <section id="model" className="relative scroll-mt-24">
-      {/* Full-width section block */}
       <div className="w-full bg-panel px-8 py-16 sm:px-14 sm:py-24 lg:px-20 lg:py-32">
-        {/* Section label */}
-        <h2 className="mx-auto max-w-6xl font-heading text-[clamp(2.4rem,5.5vw,4.5rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-foreground mb-12">
+        {/* Section label — now centred above the 2-col block. */}
+        <h2 className="mx-auto max-w-6xl text-center font-heading text-[clamp(2.4rem,5.5vw,4.5rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-foreground mb-12">
           What is Pinace?
         </h2>
 
-        {/* 2-column layout */}
         <Reveal
           className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20"
           y={26}
@@ -33,7 +30,7 @@ export default function Model() {
             </div>
           </div>
 
-          {/* Right — content */}
+          {/* Right — content. "Start now" CTA removed per request. */}
           <div>
             <h2 className="font-heading text-[clamp(2.4rem,5vw,4.2rem)] font-bold leading-[1.08] tracking-tight text-foreground">
               Delegate without
@@ -42,18 +39,10 @@ export default function Model() {
             </h2>
 
             <p className="mt-8 max-w-xl text-[1.15rem] leading-relaxed text-foreground/60">
-              Pinace is the autonomous agent wallet on Sui. Give an AI agent a
+              Pinace is the autonomous-agent wallet on Sui. Give an AI agent a
               budget and a rulebook — not your private key. On-chain policy
               enforcement, one-click revoke, all from your wallet.
             </p>
-
-            <a
-              href="#how"
-              className="mt-10 inline-flex items-center gap-2.5 rounded-full bg-foreground px-7 py-4 text-[15px] font-semibold uppercase tracking-wide text-white dark:text-[#0a0e1a] transition-transform hover:scale-105"
-            >
-              <span>start now</span>
-              <ArrowUpRight className="size-5" />
-            </a>
           </div>
         </Reveal>
       </div>

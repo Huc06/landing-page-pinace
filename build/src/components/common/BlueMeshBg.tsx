@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * Hero ocean — Pinace brand sailboats tacking right-to-left across a
@@ -13,8 +13,26 @@ import { useEffect, useRef } from "react";
  *
  * prefers-reduced-motion → everything pins still.
  */
+type Splash = { id: number; x: number; y: number };
+
 export function BlueMeshBg() {
   const root = useRef<HTMLDivElement>(null);
+  const [splashes, setSplashes] = useState<Splash[]>([]);
+  // Track a monotonic id so React's keyed reconciliation never reuses
+  // an old ripple's animation frame.
+  const splashId = useRef(0);
+
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    const rect = root.current?.getBoundingClientRect();
+    if (!rect) return;
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    const id = ++splashId.current;
+    setSplashes((s) => [...s, { id, x, y }]);
+    window.setTimeout(() => {
+      setSplashes((s) => s.filter((sp) => sp.id !== id));
+    }, 1200);
+  };
 
   useEffect(() => {
     const el = root.current;
@@ -54,7 +72,8 @@ export function BlueMeshBg() {
     <div
       ref={root}
       aria-hidden
-      className="absolute inset-0 overflow-hidden"
+      onPointerDown={onPointerDown}
+      className="absolute inset-0 overflow-hidden cursor-crosshair"
       style={{
         background:
           "linear-gradient(180deg, #02050d 0%, #03133b 40%, #051a4e 70%, #03102f 100%)",
@@ -63,6 +82,14 @@ export function BlueMeshBg() {
         "--my": "30%",
       }}
     >
+      {/* Click ripples — visible foam splashes that grow + fade. */}
+      {splashes.map((s) => (
+        <span
+          key={s.id}
+          className="splash pointer-events-none"
+          style={{ left: `${s.x}%`, top: `${s.y}%` }}
+        />
+      ))}
       <div
         className="absolute inset-x-0 top-0 h-[55%] pointer-events-none"
         style={{
@@ -215,6 +242,39 @@ export function BlueMeshBg() {
           to {
             transform: translate3d(280px, 0, 0);
           }
+        }
+
+        /* Click ripple — outward concentric foam ring + soft halo. */
+        .splash {
+          position: absolute;
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          transform: translate(-50%, -50%);
+          pointer-events: none;
+          z-index: 2;
+          animation: splash 1.2s ease-out forwards;
+        }
+        .splash::before,
+        .splash::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          border: 2px solid rgba(170, 200, 255, 0.85);
+          animation: splash-ring 1.2s ease-out forwards;
+        }
+        .splash::after {
+          border-color: rgba(255, 255, 255, 0.55);
+          animation-delay: 0.12s;
+        }
+        @keyframes splash {
+          0%   { opacity: 1; }
+          100% { opacity: 0; }
+        }
+        @keyframes splash-ring {
+          0%   { transform: scale(0.2); opacity: 1; }
+          100% { transform: scale(6);   opacity: 0; }
         }
 
         /* Boat lanes — every boat lives inside the wave band (bottom

@@ -42,34 +42,35 @@ export default function Hero() {
         <motion.h1
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
+          whileHover={{ scale: 1.04, rotate: -1, transition: { type: "spring", stiffness: 300, damping: 14 } }}
+          whileTap={{ scale: 0.97 }}
           transition={{ delay: 0.2, duration: 0.6 }}
-          className="font-[family-name:var(--font-instrument-sans)] font-semibold text-6xl sm:text-8xl lg:text-[136px] leading-[0.9] tracking-tighter bg-gradient-to-b from-white via-white to-[#b4c0ff] bg-clip-text text-transparent"
+          className="font-[family-name:var(--font-instrument-sans)] font-semibold text-6xl sm:text-8xl lg:text-[136px] leading-[0.9] tracking-tighter bg-gradient-to-b from-white via-white to-[#b4c0ff] bg-clip-text text-transparent cursor-pointer select-none"
+          style={{ pointerEvents: "auto" }}
         >
           Pinace
         </motion.h1>
 
-        {/* Moat — short, sharp distinction vs every other "autonomous
-            agent wallet" out there. Rendered above the supporting
-            copy as the line a skim-reader will remember. */}
+        {/* Moat — single-line distinction. max-w bumped so the two
+            clauses sit on one row at desktop width. */}
         <motion.p
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35, duration: 0.5 }}
-          className="max-w-2xl font-[family-name:var(--font-instrument-sans)] text-xl sm:text-2xl font-medium leading-[1.35] text-white"
+          className="max-w-[68rem] font-[family-name:var(--font-instrument-sans)] text-lg sm:text-xl md:text-2xl font-medium leading-[1.35] text-white whitespace-nowrap"
         >
           Other agent wallets hand the AI your keys.{" "}
-          <span className="text-[#85a8ff]">Pinace hands it a budget.</span>
+          <span className="text-[#85a8ff]">Pinace gives it a budget and a rulebook.</span>
         </motion.p>
 
-        {/* Supporting */}
+        {/* Supporting — also one line at md+ */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 0.7 }}
           transition={{ delay: 0.5, duration: 0.6 }}
-          className="max-w-xl font-[family-name:var(--font-instrument-sans)] text-base sm:text-lg leading-[1.65] text-white"
+          className="max-w-[64rem] font-[family-name:var(--font-instrument-sans)] text-sm sm:text-base md:text-lg leading-[1.65] text-white md:whitespace-nowrap"
         >
-          On-chain policy enforcement, one-click revoke, never
-          custodial — built on Sui Move.
+          On-chain policy enforcement · one-click revoke · never custodial · built on Sui Move.
         </motion.p>
 
         {/* CTA Buttons */}
