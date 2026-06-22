@@ -11,13 +11,15 @@ const POWERED = [
     name: "Sui",
     href: "https://sui.io",
     icon: (
-      // Sui droplet, simplified from sui.io brand kit.
-      <svg viewBox="0 0 32 32" className="h-5 w-5" aria-hidden>
-        <path
-          d="M16 3.2c-1 1.8-6.2 6.7-9.1 11.4a10.6 10.6 0 1 0 18.2 0C22.2 9.9 17 5 16 3.2zm-1.2 8.4a18 18 0 0 1 1.2-1.5c.3.4.7.9 1.2 1.5 1.4 1.9 3.4 4.5 4.1 7.4-1.2-.6-2.8-1.1-4.5-1.1-2.3 0-4.4.6-5.9 1.5-.3.2-.6.3-.8.5.7-3 2.8-5.8 4.3-7.7l.4-.6z"
-          fill="#6FBCF0"
-        />
-      </svg>
+      // Brand mark provided by user — drop-in PNG.
+      <Image
+        src="/brand/sui-logo.png"
+        alt=""
+        width={20}
+        height={20}
+        className="h-5 w-5"
+        aria-hidden
+      />
     ),
   },
   {
