@@ -12,10 +12,14 @@ type Props = {
 /**
  * "Add to Chrome" trigger reused across Nav / Hero / FinalCta.
  *
- * The wallet isn't on the Chrome Web Store yet — clicking pops a
- * centred modal (HeroUI-style) explaining we're working on it and
- * pointing to GitHub for early access. Click-outside or Esc closes.
+ * The Chrome Web Store listing is in review. The source repo is
+ * currently private, so the modal links straight to the README's
+ * Build & Ship section (anyone with repo access can build their own
+ * .zip from there) AND offers a Telegram fallback for the unpacked
+ * build. Click-outside or Esc closes.
  */
+const TELEGRAM_HANDLE = "johntran03";
+const GITHUB_BUILD_URL = "https://github.com/pinace-wallet/frontend#build--ship";
 export function AddToChromeButton({ children, className }: Props) {
   const [open, setOpen] = useState(false);
 
@@ -127,10 +131,8 @@ export function AddToChromeButton({ children, className }: Props) {
               </div>
 
               <div className="space-y-1.5">
-                <p
-                  className="text-xs font-semibold uppercase tracking-[0.18em] text-[#7AA0FF]"
-                >
-                  Coming soon
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#7AA0FF]">
+                  Early access
                 </p>
                 <h2
                   id="chrome-toast-title"
@@ -140,14 +142,56 @@ export function AddToChromeButton({ children, className }: Props) {
                 </h2>
                 <p className="text-sm leading-relaxed text-white/65">
                   Pinace Wallet is launching on the Chrome Web Store
-                  shortly. Want early access? Grab the unpacked build
-                  from our GitHub and load it manually.
+                  shortly. Want the unpacked build now? The repo is
+                  currently private — DM the maintainer on Telegram
+                  and you&apos;ll get the zipped extension.
                 </p>
               </div>
 
-              <div className="mt-2 flex w-full flex-col gap-2.5 sm:flex-row sm:justify-center">
+              {/* Telegram handle card — copy-friendly + obvious affordance. */}
+              <a
+                href={`https://t.me/${TELEGRAM_HANDLE}`}
+                target="_blank"
+                rel="noreferrer"
+                className="group flex w-full items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.025] px-4 py-3 text-left transition-all hover:border-[#7AA0FF]/40 hover:bg-white/[0.05]"
+              >
+                <span
+                  className="flex size-9 shrink-0 items-center justify-center rounded-full"
+                  style={{ background: "rgba(48,84,255,0.18)" }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#7AA0FF" aria-hidden>
+                    <path d="M9.78 17.65 9.6 14.17l8.32-7.5c.36-.32-.08-.48-.55-.2L7.1 13.04 2.66 11.63c-.96-.28-.97-.95.21-1.4l17.32-6.68c.79-.36 1.55.19 1.25 1.4l-2.95 13.9c-.2.97-.79 1.2-1.59.75l-4.4-3.25-2.12 2.05c-.24.24-.45.45-.92.45z" />
+                  </svg>
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[11.5px] font-medium uppercase tracking-[0.14em] text-white/40">
+                    Telegram
+                  </p>
+                  <p className="font-[family-name:var(--font-instrument-sans)] text-base font-semibold text-white">
+                    @{TELEGRAM_HANDLE}
+                  </p>
+                </div>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  className="shrink-0 text-white/35 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-white"
+                  aria-hidden
+                >
+                  <path
+                    d="M7 17L17 7M10 7h7v7"
+                    stroke="currentColor"
+                    strokeWidth="1.8"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </a>
+
+              <div className="mt-1 flex w-full flex-col gap-2.5 sm:flex-row sm:justify-center">
                 <a
-                  href="https://github.com/pinace-wallet"
+                  href={GITHUB_BUILD_URL}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex flex-1 items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-semibold text-white transition-shadow"
